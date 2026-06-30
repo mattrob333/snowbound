@@ -3,7 +3,7 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** Phase 6 in progress — PowerupPickup implemented (duration tracking, type-specific visuals, activation/deactivation callbacks)
+**Status:** Phase 6 complete — all pickups and objectives implemented. All 120 tests green.
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 3m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
@@ -16,7 +16,7 @@
 4. [x] Phase 3 — Player vertical slice
 5. [x] Phase 4 — Slide and wall-run
 6. [x] Phase 5 — Level data loader
-7. [ ] Phase 6 — Pickups and objectives
+7. [x] Phase 6 — Pickups and objectives
 8. [ ] Phase 7 — Monster chase director
 9. [ ] Phase 8 — Hazard system
 10. [ ] Phase 9 — Save and progression
@@ -30,13 +30,13 @@
 - **Phase 3:** CharacterKCC (Rapier kinematic controller), PlayerController (WASD+sprint+jump), functional InputManager, ThirdPersonCameraRig, Player entity, wired into GameApp/GameLoop. 23 tests passing (6 suites).
 - **Phase 4:** SlideController + WallRunController wired into PlayerController, setColliderHalfHeight on CharacterKCC (collider change for slide), wall-run raycasts + state + wall jump + cooldowns, low obstacle slide test. 50 tests passing (9 suites).
 - **Phase 5:** LevelData interfaces, LevelLoader (spawn terrain/obstacles/part/safe zone/hazards), LevelManager (load/unload lifecycle), RoutePath (waypoint path + closest progress), level-01.json (Crash Site), LevelLoader.test.ts (11 tests). 77 tests passing (11 suites).
-- **Phase 6:** EntityManager (entity tracking: add/remove/clear/update), Pickup base entity (Rapier sensor + onCollect callback + dispose, proximity detection via Pickup.update()), HelicopterPartPickup (glowing rotating cube, partId), Hud.ts (DOM-based objective text overlay — find part / return to safe zone / level complete states), SafeZone.ts (entity detecting player overlap + part-collected check, fires onLevelComplete/onPlayerEnter/onPlayerExit), SafeZone.test.ts (8 tests), **PowerupPickup (temporary effect pickup with type-specific colors, duration tracking, activation/deactivation callbacks, PowerupPickup.test.ts — 7 tests). 107 tests passing (15 suites).**
+- **Phase 6:** EntityManager, Pickup base, HelicopterPartPickup, Hud.ts, SafeZone.ts, **PowerupPickup (temporary effects: speed_boost/dog_repel/shield/magnet with duration tracking, activation/deactivation callbacks), PlayerUpgradeService (permanent upgrade tracking with combined stat multipliers), UpgradePickup (permanent upgrade entity with type-specific octahedron visuals). 120 tests passing (16 suites).**
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 6: Permanent upgrade effect — UpgradePickup that grants persistent upgrade (e.g. increased sprint speed, longer wall-run duration) tracked via PlayerUpgradeService
+- Phase 7: Monster chase director — create MonsterDog placeholder, route progress model (following dogRoute waypoints from level JSON), gap calculation between dog and player, chase trigger after part pickup, catch condition → game over, dog close warning UI
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -46,9 +46,11 @@ _(none yet)_
 - Levels are data-driven via JSON — never hardcode level geometry in gameplay systems.
 - enum keyword is banned by tsconfig's `erasableSyntaxOnly: true` — use const objects + type alias pattern.
 - Use separate `describe` blocks with separate PhysicsWorld instances for integration tests to avoid leftover KCC rigid body pollution.
-- Hud.ts creates DOM elements — may need jsdom environment for unit tests. SafeZone tests work with `null` renderer.
+- Hud.ts creates DOM elements — may need jsdom environment for unit tests.
 - When adding entities that create physics bodies, remove them in `dispose()` to prevent test pollution.
 - The HelicopterPartPickup creates its own mesh+body via Pickup. LevelLoader also spawns a raw part mesh+body — this creates duplicates. Next refactor: remove raw part/safezone spawning from LevelLoader and rely on entities only.
 - PowerupPickup.onActivate fires after the base Pickup.onCollect. The PowerupPickup sets `this.onCollect` in its constructor. If subclasses override `onCollect`, they must chain super's behavior.
+- PlayerUpgradeService stores upgrades in-memory for now; will integrate with SaveService (Phase 9).
+- UpgradePickup uses an OctahedronGeometry (different from Pickup's box and PowerupPickup's box) to visually distinguish permanent upgrades from temporary powerups.
 
-**Last Updated:** 2026-06-30 — Phase 6: PowerupPickup implemented (107 tests, 15 suites)
+**Last Updated:** 2026-06-30 — Phase 6 complete. PowerupPickup + PlayerUpgradeService + UpgradePickup (120 tests)

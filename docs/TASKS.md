@@ -58,7 +58,7 @@
 - [x] HUD objective text — Hud.ts with DOM overlay showing objective state
 - [x] Part required for safe zone — SafeZone.ts entity, wired into LevelManager
 - [x] Temporary power-up effect — PowerupPickup with type-specific visuals, duration tracking, activation/deactivation callbacks (107 tests)
-- [ ] Permanent upgrade effect
+- [x] Permanent upgrade effect — UpgradePickup + PlayerUpgradeService (4 upgrade types, stat multipliers, 120 tests)
 
 ## Phase 7: Monster chase director
 - [ ] Dog placeholder model
