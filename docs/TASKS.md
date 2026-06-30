@@ -17,12 +17,12 @@
 - [x] Debug grid
 
 ## Phase 2: Physics foundation
-- [ ] Rapier async init
-- [ ] PhysicsWorld with World
-- [ ] Static ground collider
-- [ ] Debug physics overlay
-- [ ] Collision groups
-- [ ] Raycast helper
+- [x] Rapier async init
+- [x] PhysicsWorld with World
+- [x] Static ground collider
+- [x] Debug physics overlay
+- [x] Collision groups
+- [x] Raycast helper
 
 ## Phase 3: Player vertical slice
 - [ ] Jim capsule placeholder

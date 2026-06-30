@@ -56,6 +56,9 @@ export class GameApp {
     const physics = new PhysicsWorld();
     await physics.init();
 
+    // Add static ground collider matching the visual snow plane
+    physics.addStaticGroundCollider(200, -0.5);
+
     // Add a simple test box
     const boxGeo = new THREE.BoxGeometry(1, 1, 1);
     const boxMat = new THREE.MeshStandardMaterial({ color: 0x44aaff });
