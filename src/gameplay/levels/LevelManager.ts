@@ -1,11 +1,28 @@
 import { LevelLoader, type LevelRuntime } from './LevelLoader';
-import type { LevelData } from './LevelData';
+import type { LevelData, HazardSpawn } from './LevelData';
 import type { PhysicsWorld } from '../../engine/physics/PhysicsWorld';
 import type { ThreeRenderer } from '../../engine/rendering/ThreeRenderer';
 import type { EntityManager } from '../entities/EntityManager';
 import { HelicopterPartPickup } from '../pickups/HelicopterPartPickup';
 import { SafeZone } from './SafeZone';
 import { MonsterChaseDirector } from '../monster/MonsterChaseDirector';
+import { FallingIceHazard } from '../hazards/FallingIceHazard';
+import type { Hazard } from '../hazards/Hazard';
+
+function createHazardFromSpawn(spawn: HazardSpawn): Hazard | null {
+  switch (spawn.type) {
+    case 'falling_ice':
+      return new FallingIceHazard(
+        spawn.position,
+        spawn.halfExtents,
+        spawn.triggerRadius ?? 2,
+        spawn.fallDelay ?? 1.0,
+      );
+    default:
+      // Other hazard types not yet implemented
+      return null;
+  }
+}
 
 export class LevelManager {
   private loader: LevelLoader;
@@ -102,6 +119,14 @@ export class LevelManager {
         scene,
       );
       entityManager.add(this._chaseDirector);
+
+      // Create hazard entities from level data
+      for (const spawn of data.hazards) {
+        const hazard = createHazardFromSpawn(spawn);
+        if (hazard) {
+          entityManager.add(hazard);
+        }
+      }
     }
   }
 

@@ -70,10 +70,10 @@
 - [x] Dog close warning UI (HUD element, shows when dog within 8 units)
 
 ## Phase 8: Hazard system
-- [ ] Hazard base class
-- [ ] Falling ice hazard
-- [ ] Cracked ice / stumble zones
-- [ ] Jump-over obstacles
+- [x] Hazard base class (IGameEntity, template method with trigger-radius detection, activate/spent lifecycle)
+- [x] Falling ice hazard (FallingIceHazard — trigger zone, delayed drop, dynamic icosahedron block)
+- [ ] Cracked ice / stumble zones — CrackedIceHazard
+- [ ] Jump-over obstacles (already handled by player)
 - [ ] Dog gap penalty on mistakes
 - [ ] Game over on major hazards
 
