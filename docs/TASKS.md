@@ -54,7 +54,7 @@
 - [x] GameEntity interface (IGameEntity) + EntityManager tracking (add/remove/clear/update)
 - [x] Pickup sensor — Pickup base entity (Rapier sensor body, collected state, onCollect callback, dispose)
 - [x] Helicopter part pickup — HelicopterPartPickup (glowing rotating cube, partId)
-- [ ] Pickup detection in game loop (collision events between player and pickup sensors)
+- [x] Pickup detection in game loop (proximity check via Pickup.update() against player KCC position)
 - [ ] HUD objective text
 - [ ] Part required for safe zone
 - [ ] Temporary power-up effect
