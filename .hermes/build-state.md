@@ -30,12 +30,13 @@
 - **Phase 3:** CharacterKCC (Rapier kinematic controller), PlayerController (WASD+sprint+jump), functional InputManager, ThirdPersonCameraRig, Player entity, wired into GameApp/GameLoop. 23 tests passing (6 suites).
 - **Phase 4:** SlideController + WallRunController wired into PlayerController, setColliderHalfHeight on CharacterKCC (collider change for slide), wall-run raycasts + state + wall jump + cooldowns, low obstacle slide test. 50 tests passing (9 suites).
 - **Phase 5:** LevelData interfaces, LevelLoader (spawn terrain/obstacles/part/safe zone/hazards), LevelManager (load/unload lifecycle), RoutePath (waypoint path + closest progress), level-01.json (Crash Site), LevelLoader.test.ts (11 tests). 77 tests passing (11 suites).
+- **Phase 6:** EntityManager (entity tracking: add/remove/clear/update), Pickup base entity (Rapier sensor + onCollect callback + dispose), HelicopterPartPickup (glowing rotating cube, partId). 88 tests passing (13 suites).
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 6: Pickups and objectives — GameEntity base class, EntityManager (entity tracking), Pickup base entity, HelicopterPartPickup sensor + collection logic, test
+- Phase 6: Wire pickup detection into game loop — collision events between player and sensor bodies, collect helicopter parts, HUD objective text
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -46,4 +47,4 @@ _(none yet)_
 - enum keyword is banned by tsconfig's `erasableSyntaxOnly: true` — use const objects + type alias pattern.
 - Use separate `describe` blocks with separate PhysicsWorld instances for integration tests to avoid leftover KCC rigid body pollution.
 
-**Last Updated:** 2026-06-30 — Phase 5 complete (Level data loader), Phase 6 next (Pickups & objectives)
+**Last Updated:** 2026-06-30 — Phase 5 complete, Phase 6 started (EntityManager, Pickup, HelicopterPartPickup, 88 tests)

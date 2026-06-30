@@ -51,8 +51,10 @@
 - [x] Level unload cleanup — LevelLoader.unloadLevel()
 
 ## Phase 6: Pickups and objectives
-- [ ] Pickup sensor (Rapier)
-- [ ] Helicopter part pickup
+- [x] GameEntity interface (IGameEntity) + EntityManager tracking (add/remove/clear/update)
+- [x] Pickup sensor — Pickup base entity (Rapier sensor body, collected state, onCollect callback, dispose)
+- [x] Helicopter part pickup — HelicopterPartPickup (glowing rotating cube, partId)
+- [ ] Pickup detection in game loop (collision events between player and pickup sensors)
 - [ ] HUD objective text
 - [ ] Part required for safe zone
 - [ ] Temporary power-up effect
