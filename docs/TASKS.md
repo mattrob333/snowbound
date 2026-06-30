@@ -25,8 +25,8 @@
 - [x] Raycast helper
 
 ## Phase 3: Player vertical slice
-- [ ] Jim capsule placeholder
-- [ ] Kinematic character controller
+- [x] Jim capsule placeholder (CharacterKCC)
+- [x] Kinematic character controller
 - [ ] WASD + camera-relative movement
 - [ ] Sprint
 - [ ] Jump
