@@ -61,13 +61,13 @@
 - [x] Permanent upgrade effect — UpgradePickup + PlayerUpgradeService (4 upgrade types, stat multipliers, 120 tests)
 
 ## Phase 7: Monster chase director
-- [ ] Dog placeholder model
-- [ ] Route progress model
-- [ ] Dog gap calculation
-- [ ] Dog moves along route
-- [ ] Chase trigger after part pickup
-- [ ] Catch condition + game over
-- [ ] Dog close warning UI
+- [x] Dog placeholder model (brown capsule)
+- [x] Route progress model (MonsterDistanceModel — gap calc + alert thresholds)
+- [x] Dog gap calculation
+- [x] Dog moves along route (patrol behind player, chase towards player)
+- [x] Chase trigger after part pickup
+- [x] Catch condition + game over callback
+- [x] Dog close warning UI (HUD element, shows when dog within 8 units)
 
 ## Phase 8: Hazard system
 - [ ] Hazard base class

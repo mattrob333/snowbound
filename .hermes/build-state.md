@@ -3,7 +3,7 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** Phase 6 complete — all pickups and objectives implemented. All 120 tests green.
+**Status:** Phase 7 complete — monster chase director with dog, chase trigger, catch, and UI warning. 152 tests green.
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 3m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
@@ -17,7 +17,7 @@
 5. [x] Phase 4 — Slide and wall-run
 6. [x] Phase 5 — Level data loader
 7. [x] Phase 6 — Pickups and objectives
-8. [ ] Phase 7 — Monster chase director
+8. [x] Phase 7 — Monster chase director
 9. [ ] Phase 8 — Hazard system
 10. [ ] Phase 9 — Save and progression
 11. [ ] Phase 10 — Build all 15 levels
@@ -30,13 +30,14 @@
 - **Phase 3:** CharacterKCC (Rapier kinematic controller), PlayerController (WASD+sprint+jump), functional InputManager, ThirdPersonCameraRig, Player entity, wired into GameApp/GameLoop. 23 tests passing (6 suites).
 - **Phase 4:** SlideController + WallRunController wired into PlayerController, setColliderHalfHeight on CharacterKCC (collider change for slide), wall-run raycasts + state + wall jump + cooldowns, low obstacle slide test. 50 tests passing (9 suites).
 - **Phase 5:** LevelData interfaces, LevelLoader (spawn terrain/obstacles/part/safe zone/hazards), LevelManager (load/unload lifecycle), RoutePath (waypoint path + closest progress), level-01.json (Crash Site), LevelLoader.test.ts (11 tests). 77 tests passing (11 suites).
-- **Phase 6:** EntityManager, Pickup base, HelicopterPartPickup, Hud.ts, SafeZone.ts, **PowerupPickup (temporary effects: speed_boost/dog_repel/shield/magnet with duration tracking, activation/deactivation callbacks), PlayerUpgradeService (permanent upgrade tracking with combined stat multipliers), UpgradePickup (permanent upgrade entity with type-specific octahedron visuals). 120 tests passing (16 suites).**
+- **Phase 6:** EntityManager, Pickup base, HelicopterPartPickup, Hud.ts, SafeZone.ts, PowerupPickup (temporary effects: speed_boost/dog_repel/shield/magnet with duration tracking, activation/deactivation callbacks), PlayerUpgradeService (permanent upgrade tracking with combined stat multipliers), UpgradePickup (permanent upgrade entity with type-specific octahedron visuals). 120 tests passing (16 suites).
+- **Phase 7:** MonsterChaseDirector + MonsterDog (brown capsule, route-based movement with patrol/chase states) + MonsterDistanceModel (gap calculation with close/catch thresholds, configurable). Dog moves along route waypoints; stays patrolDistance behind player during patrol; chases at chaseSpeed after part pickup; catch condition fires onCatchPlayer callback. Hud.ts: dog close warning element (red bottom bar, fades in when dog ≤ 8 units). Dog collision group added to CollisionGroups. 152 tests passing (19 suites).
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 7: Monster chase director — create MonsterDog placeholder, route progress model (following dogRoute waypoints from level JSON), gap calculation between dog and player, chase trigger after part pickup, catch condition → game over, dog close warning UI
+- Phase 8: Hazard system — create Hazard base entity, FallingIceHazard (triggered by player proximity, falls after delay), CrackedIceHazard (stumble zone triggers momentary stumble), jump-over/slide-under obstacle handling, cliff death zone, dog gap penalty on hazards
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.

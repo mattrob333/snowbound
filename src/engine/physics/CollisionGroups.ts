@@ -20,6 +20,8 @@ export const CollisionGroups = {
   Pickup: 0x0010_0010,
   /** Members: Hazard. Collides with: Player, Dog */
   Hazard: 0x0020_0020,
+  /** Members: Dog. Collides with: Terrain, Obstacle */
+  Dog: 0x0002_0002,
   /** Members: SafeZone (sensor). Collides with: Player */
   SafeZone: 0x0040_0040,
 } as const;

@@ -5,6 +5,7 @@ import type { ThreeRenderer } from '../../engine/rendering/ThreeRenderer';
 import type { EntityManager } from '../entities/EntityManager';
 import { HelicopterPartPickup } from '../pickups/HelicopterPartPickup';
 import { SafeZone } from './SafeZone';
+import { MonsterChaseDirector } from '../monster/MonsterChaseDirector';
 
 export class LevelManager {
   private loader: LevelLoader;
@@ -14,6 +15,7 @@ export class LevelManager {
   private currentRuntime: LevelRuntime | null = null;
   private currentData: LevelData | null = null;
   private _safeZone: SafeZone | null = null;
+  private _chaseDirector: MonsterChaseDirector | null = null;
 
   constructor(physics: PhysicsWorld, renderer: ThreeRenderer | null = null) {
     this.physics = physics;
@@ -42,6 +44,11 @@ export class LevelManager {
     return this._safeZone;
   }
 
+  /** The current level's MonsterChaseDirector (null until level loads) */
+  get chaseDirector(): MonsterChaseDirector | null {
+    return this._chaseDirector;
+  }
+
   /** Load a level by ID from the assets/levels/ directory */
   async loadLevel(
     levelId: string,
@@ -62,7 +69,7 @@ export class LevelManager {
     this.currentRuntime = runtime;
     this.currentData = data;
 
-    // Create pickup and safe zone entities after level is loaded
+    // Create pickup, safe zone, and monster chase director entities after level is loaded
     if (entityManager) {
       if (data.helicopterPart) {
         const pickup = new HelicopterPartPickup(
@@ -86,6 +93,15 @@ export class LevelManager {
         sz.requiresPart,
       );
       entityManager.add(this._safeZone);
+
+      // Create the monster chase director with dog route + tuning
+      const scene = this.renderer?.scene ?? null;
+      this._chaseDirector = new MonsterChaseDirector(
+        data.dogRoute,
+        data.dogTuning,
+        scene,
+      );
+      entityManager.add(this._chaseDirector);
     }
   }
 
@@ -93,6 +109,8 @@ export class LevelManager {
   unloadCurrent(): void {
     if (!this.currentRuntime) return;
     this.loader.unloadLevel(this.currentRuntime);
+    this._chaseDirector?.dispose();
+    this._chaseDirector = null;
     this.currentRuntime = null;
     this.currentData = null;
     this.currentLevelId = null;

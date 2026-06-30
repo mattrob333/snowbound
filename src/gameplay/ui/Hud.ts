@@ -10,8 +10,10 @@ export type ObjectiveState = 'find_part' | 'return_to_zone' | 'level_complete' |
 export class Hud {
   private container: HTMLDivElement;
   private objectiveEl: HTMLDivElement;
+  private warningEl: HTMLDivElement;
   private _objectiveState: ObjectiveState = 'none';
   private _lastDisplayedState: ObjectiveState | null = null;
+  private _lastWarningVisible = false;
   private attached = false;
 
   constructor() {
@@ -47,7 +49,29 @@ export class Hud {
     `;
     this.objectiveEl.textContent = '';
 
+    // Dog close warning — centred near the bottom
+    this.warningEl = document.createElement('div');
+    this.warningEl.style.cssText = `
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #ff4444;
+      font-size: 14px;
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(255,0,0,0.6), 0 1px 4px rgba(0,0,0,0.8);
+      text-align: center;
+      background: rgba(0,0,0,0.5);
+      padding: 6px 16px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    `;
+    this.warningEl.textContent = '⚠️ Dog is close! Run!';
+
     this.container.appendChild(this.objectiveEl);
+    this.container.appendChild(this.warningEl);
   }
 
   /** Attach the HUD overlay to a parent element (typically the renderer container) */
@@ -107,6 +131,14 @@ export class Hud {
     if (this._objectiveState !== this._lastDisplayedState) {
       this._lastDisplayedState = this._objectiveState;
       this.objectiveEl.textContent = this.getObjectiveText(this._objectiveState);
+    }
+
+    // Dog close warning — check chase director
+    const director = ctx.levelManager.chaseDirector;
+    const warningVisible = director !== null && director.closeWarning && !director.caught;
+    if (warningVisible !== this._lastWarningVisible) {
+      this._lastWarningVisible = warningVisible;
+      this.warningEl.style.opacity = warningVisible ? '1' : '0';
     }
   }
 
