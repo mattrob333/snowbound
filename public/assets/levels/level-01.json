@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "id": "level-01",
+    "name": "Crash Site",
+    "description": "Jim wakes up near the crashed helicopter. Find the rotor blade and reach the safe zone.",
+    "order": 1
+  },
+  "atmosphere": {
+    "fogColor": 18783696,
+    "fogDensity": 0.003,
+    "ambientIntensity": 0.6,
+    "directionalIntensity": 1.0
+  },
+  "playerSpawn": { "x": 0, "y": 1, "z": -8 },
+  "terrain": [
+    { "position": { "x": 0, "y": -0.5, "z": 0 }, "halfExtents": { "x": 20, "y": 0.5, "z": 20 }, "rotationY": 0, "color": 15066597 },
+    { "position": { "x": 0, "y": 0, "z": 15 }, "halfExtents": { "x": 8, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 15066597 },
+    { "position": { "x": 0, "y": 1, "z": 22 }, "halfExtents": { "x": 6, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 15066597 }
+  ],
+  "obstacles": [
+    { "type": "jump_over", "position": { "x": -3, "y": 0, "z": 5 }, "halfExtents": { "x": 1.5, "y": 0.5, "z": 1 }, "color": 13369344 },
+    { "type": "jump_over", "position": { "x": 3, "y": 0, "z": 8 }, "halfExtents": { "x": 1.5, "y": 0.5, "z": 1 }, "color": 13369344 },
+    { "type": "slide_under", "position": { "x": 0, "y": 1.8, "z": 12 }, "halfExtents": { "x": 4, "y": 0.25, "z": 1 }, "color": 10066329 }
+  ],
+  "dogRoute": [
+    { "position": { "x": 0, "y": 0, "z": -20 } },
+    { "position": { "x": 0, "y": 0, "z": -10 } },
+    { "position": { "x": 0, "y": 0, "z": 5 } },
+    { "position": { "x": 0, "y": 0, "z": 15 } },
+    { "position": { "x": 0, "y": 0, "z": 25 } }
+  ],
+  "dogTuning": {
+    "patrolSpeed": 3.0,
+    "chaseSpeed": 8.0,
+    "catchRadius": 1.2,
+    "patrolDistance": 15.0
+  },
+  "helicopterPart": {
+    "position": { "x": 0, "y": 1, "z": 10 },
+    "partId": "rotor_blade"
+  },
+  "safeZone": {
+    "position": { "x": 0, "y": 0.5, "z": 25 },
+    "radius": 3,
+    "requiresPart": true
+  },
+  "powerups": [],
+  "hazards": []
+}

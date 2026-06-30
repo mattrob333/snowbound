@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Hermes builder lock (ephemeral)
+.hermes/builder.lock

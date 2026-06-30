@@ -79,7 +79,7 @@ export class GameApp {
     const entityManager = new EntityManager();
     const assets = new AssetManager();
     const audio = new AudioManager();
-    const levelManager = new LevelManager();
+    const levelManager = new LevelManager(physics, renderer);
     const saveService = new SaveService();
     const debug = new DebugOverlay();
 

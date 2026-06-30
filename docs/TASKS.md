@@ -42,13 +42,13 @@
 - [x] Cooldowns
 
 ## Phase 5: Level data loader
-- [ ] LevelData interfaces
-- [ ] Load level-01.json
-- [ ] Spawn terrain from JSON
-- [ ] Spawn obstacles from JSON
-- [ ] Spawn helicopter part
-- [ ] Spawn safe zone
-- [ ] Level unload cleanup
+- [x] LevelData interfaces — LevelData.ts (all interfaces: LevelMeta, Vec3, AABB, TerrainPiece, ObstacleData, DogWaypoint, HelicopterPartSpawn, PowerupSpawn, SafeZoneData, HazardSpawn, LevelAtmosphere, DogTuning)
+- [x] Load level-01.json — public/assets/levels/level-01.json (Crash Site)
+- [x] Spawn terrain from JSON — LevelLoader.spawnTerrainPiece()
+- [x] Spawn obstacles from JSON — LevelLoader.spawnObstacle()
+- [x] Spawn helicopter part — LevelLoader.spawnHelicopterPart()
+- [x] Spawn safe zone — LevelLoader.spawnSafeZone()
+- [x] Level unload cleanup — LevelLoader.unloadLevel()
 
 ## Phase 6: Pickups and objectives
 - [ ] Pickup sensor (Rapier)

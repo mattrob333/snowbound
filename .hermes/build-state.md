@@ -13,9 +13,9 @@
 1. [x] Phase 0 — Repo foundation (Vite, deps, blank three.js scene)
 2. [x] Phase 1 — Basic renderer and camera
 3. [x] Phase 2 — Physics foundation
-|4. [x] Phase 3 — Player vertical slice
-|5. [x] Phase 4 — Slide and wall-run
-|6. [ ] Phase 5 — Level data loader
+4. [x] Phase 3 — Player vertical slice
+5. [x] Phase 4 — Slide and wall-run
+6. [x] Phase 5 — Level data loader
 7. [ ] Phase 6 — Pickups and objectives
 8. [ ] Phase 7 — Monster chase director
 9. [ ] Phase 8 — Hazard system
@@ -29,12 +29,13 @@
 - **Phase 2:** Rapier async init, PhysicsWorld, static ground collider, CollisionGroups, PhysicsDebug overlay, raycast helper, tests
 - **Phase 3:** CharacterKCC (Rapier kinematic controller), PlayerController (WASD+sprint+jump), functional InputManager, ThirdPersonCameraRig, Player entity, wired into GameApp/GameLoop. 23 tests passing (6 suites).
 - **Phase 4:** SlideController + WallRunController wired into PlayerController, setColliderHalfHeight on CharacterKCC (collider change for slide), wall-run raycasts + state + wall jump + cooldowns, low obstacle slide test. 50 tests passing (9 suites).
+- **Phase 5:** LevelData interfaces, LevelLoader (spawn terrain/obstacles/part/safe zone/hazards), LevelManager (load/unload lifecycle), RoutePath (waypoint path + closest progress), level-01.json (Crash Site), LevelLoader.test.ts (11 tests). 77 tests passing (11 suites).
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 5: Level data loader — LevelData interfaces, load level-01.json, spawn terrain/obstacles/part/safe zone from JSON, level unload
+- Phase 6: Pickups and objectives — GameEntity base class, EntityManager (entity tracking), Pickup base entity, HelicopterPartPickup sensor + collection logic, test
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -45,4 +46,4 @@ _(none yet)_
 - enum keyword is banned by tsconfig's `erasableSyntaxOnly: true` — use const objects + type alias pattern.
 - Use separate `describe` blocks with separate PhysicsWorld instances for integration tests to avoid leftover KCC rigid body pollution.
 
-**Last Updated:** 2026-06-30 — Phase 4 complete (Slide and wall-run), Phase 5 next
+**Last Updated:** 2026-06-30 — Phase 5 complete (Level data loader), Phase 6 next (Pickups & objectives)
