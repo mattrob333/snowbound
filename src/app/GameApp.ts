@@ -10,6 +10,9 @@ import { SaveService } from '../gameplay/save/SaveService';
 import { DebugOverlay } from '../engine/debug/DebugOverlay';
 import { GameLoop } from './GameLoop';
 import { SceneStateMachine, AppState } from './SceneStateMachine';
+import { Player } from '../gameplay/player/Player';
+import { ThirdPersonCameraRig } from '../engine/camera/ThirdPersonCameraRig';
+import { CAMERA_DISTANCE } from '../config/constants';
 import type { GameContext } from './GameContext';
 
 export class GameApp {
@@ -22,6 +25,10 @@ export class GameApp {
 
     const renderer = new ThreeRenderer();
     container.appendChild(renderer.renderer.domElement);
+
+    // Attach input to window
+    const input = new InputManager();
+    input.attach(window);
 
     // Add placeholder snowy ground
     const groundGeo = new THREE.PlaneGeometry(200, 200);
@@ -59,17 +66,19 @@ export class GameApp {
     // Add static ground collider matching the visual snow plane
     physics.addStaticGroundCollider(200, -0.5);
 
-    // Add a simple test box
-    const boxGeo = new THREE.BoxGeometry(1, 1, 1);
-    const boxMat = new THREE.MeshStandardMaterial({ color: 0x44aaff });
-    const box = new THREE.Mesh(boxGeo, boxMat);
-    box.position.set(0, 1.5, 2);
-    renderer.scene.add(box);
+    // Create third-person camera rig
+    const cameraRig = new ThirdPersonCameraRig(renderer.camera);
+    cameraRig.setAzimuth(0);
+    cameraRig.setDistance(CAMERA_DISTANCE);
+
+    // Create the player (includes CharacterKCC + PlayerController)
+    const player = new Player(physics, cameraRig);
+    player.mesh.position.set(0, 4, 0);
+    renderer.scene.add(player.mesh);
 
     const entityManager = new EntityManager();
     const assets = new AssetManager();
     const audio = new AudioManager();
-    const input = new InputManager();
     const levelManager = new LevelManager();
     const saveService = new SaveService();
     const debug = new DebugOverlay();
@@ -84,6 +93,7 @@ export class GameApp {
       levelManager,
       saveService,
       debug,
+      player,
       clock: { elapsed: 0, delta: 0 },
     };
 

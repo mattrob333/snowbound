@@ -30,6 +30,7 @@ export class GameLoop {
 
       ctx.physics.step(FIXED_DT);
       ctx.input.update();
+      ctx.player.update(FIXED_DT, ctx);
       ctx.entityManager.update(FIXED_DT, ctx);
       this.accumulator -= FIXED_DT;
       steps++;
