@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import RAPIER from '@dimforge/rapier3d-compat';
 import { PhysicsWorld } from '../engine/physics/PhysicsWorld';
-import { PLAYER_HEIGHT } from '../config/constants';
+import { PLAYER_HEIGHT, PLAYER_RADIUS } from '../config/constants';
 
 /**
  * Rapier 0.19 compat doesn't reliably fire sensor intersection events
@@ -142,5 +142,90 @@ describe('Pickup sensor proximity detection', () => {
 
     physics.removeRigidBody(playerBody);
     physics.removeRigidBody(sensorBody);
+  });
+});
+
+describe('Pickup entity detection via Pickup.update()', () => {
+  let physics: PhysicsWorld;
+
+  beforeAll(async () => {
+    physics = new PhysicsWorld();
+    await physics.init();
+    physics.addStaticGroundCollider(200, -0.5);
+  });
+
+  it('should detect player proximity and mark collected', async () => {
+    const { Pickup } = await import('../gameplay/pickups/Pickup');
+    const pickup = new Pickup(
+      physics, null, { x: 0, y: 1, z: 0 },
+    );
+    expect(pickup.collected).toBe(false);
+
+    const { CharacterKCC } = await import('../engine/physics/CharacterKCC');
+    const kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
+    kcc.setPosition({ x: 0, y: 1, z: 0 });
+
+    // Build a minimal GameContext with just the player
+    const ctx = { player: { kcc } } as any;
+
+    // Simulate one frame — player at the same position as pickup
+    physics.step(1 / 60);
+    pickup.update(1 / 60, ctx);
+
+    expect(pickup.collected).toBe(true);
+
+    kcc.dispose();
+    pickup.dispose();
+  });
+
+  it('should NOT detect pickup when player is far away', async () => {
+    const { Pickup } = await import('../gameplay/pickups/Pickup');
+    const pickup = new Pickup(
+      physics, null, { x: 50, y: 1, z: 50 },
+    );
+    expect(pickup.collected).toBe(false);
+
+    const { CharacterKCC } = await import('../engine/physics/CharacterKCC');
+    const kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
+    kcc.setPosition({ x: 0, y: 1, z: 0 });
+
+    const ctx = { player: { kcc } } as any;
+
+    physics.step(1 / 60);
+    pickup.update(1 / 60, ctx);
+
+    expect(pickup.collected).toBe(false);
+
+    kcc.dispose();
+    pickup.dispose();
+  });
+
+  it('should only call collect() once on sustained overlap', async () => {
+    const { Pickup } = await import('../gameplay/pickups/Pickup');
+    const pickup = new Pickup(
+      physics, null, { x: 0, y: 1, z: 0 },
+    );
+    let collectCount = 0;
+    pickup.onCollect = () => { collectCount++; };
+
+    const { CharacterKCC } = await import('../engine/physics/CharacterKCC');
+    const kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
+    kcc.setPosition({ x: 0, y: 1, z: 0 });
+
+    const ctx = { player: { kcc } } as any;
+
+    physics.step(1 / 60);
+
+    // First frame — should collect
+    pickup.update(1 / 60, ctx);
+    expect(pickup.collected).toBe(true);
+    expect(collectCount).toBe(1);
+
+    // Second frame — sustained overlap, should NOT call again
+    pickup.update(1 / 60, ctx);
+    expect(collectCount).toBe(1);
+
+    kcc.dispose();
+    pickup.dispose();
   });
 });

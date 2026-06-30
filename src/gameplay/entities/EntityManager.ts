@@ -19,6 +19,11 @@ export class EntityManager {
     return this.entities.length;
   }
 
+  /** Get all tracked entities (for iteration/detection) */
+  getEntities(): IGameEntity[] {
+    return this.entities;
+  }
+
   /** Add an entity to the manager */
   add(entity: IGameEntity): void {
     this.entities.push(entity);

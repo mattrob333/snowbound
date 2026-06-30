@@ -41,5 +41,7 @@ export class HelicopterPartPickup extends Pickup {
     if (this.mesh && !this.collected) {
       this.mesh.rotation.y += 0.02;
     }
+    // Let the base class handle proximity detection
+    super.update(_dt, _ctx);
   }
 }

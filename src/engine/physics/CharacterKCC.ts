@@ -95,6 +95,11 @@ export class CharacterKCC {
     this.characterBody.setTranslation(pos, true);
   }
 
+  /** Expose the character collider for proximity/pickup detection */
+  getCollider(): RAPIER.Collider {
+    return this.characterCollider;
+  }
+
   dispose(): void {
     // Removing the rigid body also removes attached colliders
     this.physics.removeRigidBody(this.characterBody);
