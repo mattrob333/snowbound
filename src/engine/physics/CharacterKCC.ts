@@ -6,12 +6,14 @@ export class CharacterKCC {
   private characterCollider: RAPIER.Collider;
   private characterBody: RAPIER.RigidBody;
   private _grounded = false;
+  private physics: PhysicsWorld;
 
   constructor(
     physics: PhysicsWorld,
     height: number,
     radius: number,
   ) {
+    this.physics = physics;
     this.controller = new RAPIER.KinematicCharacterController(
       0.01,
       physics.world.integrationParameters,
@@ -72,6 +74,7 @@ export class CharacterKCC {
   }
 
   dispose(): void {
-    // Rigid body removal also removes attached colliders
+    // Removing the rigid body also removes attached colliders
+    this.physics.removeRigidBody(this.characterBody);
   }
 }

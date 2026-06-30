@@ -21,6 +21,10 @@ export class PhysicsWorld {
     return this.world.createRigidBody(desc);
   }
 
+  removeRigidBody(body: RAPIER.RigidBody): void {
+    this.world.removeRigidBody(body);
+  }
+
   addCollider(desc: RAPIER.ColliderDesc, parent?: RAPIER.RigidBody): RAPIER.Collider {
     return this.world.createCollider(desc, parent);
   }
