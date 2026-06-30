@@ -57,7 +57,7 @@
 |- [x] Pickup detection in game loop (proximity check via Pickup.update() against player KCC position)
 - [x] HUD objective text — Hud.ts with DOM overlay showing objective state
 - [x] Part required for safe zone — SafeZone.ts entity, wired into LevelManager
-- [ ] Temporary power-up effect
+- [x] Temporary power-up effect — PowerupPickup with type-specific visuals, duration tracking, activation/deactivation callbacks (107 tests)
 - [ ] Permanent upgrade effect
 
 ## Phase 7: Monster chase director
