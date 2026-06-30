@@ -25,6 +25,13 @@ export class PhysicsWorld {
     return this.world.createCollider(desc, parent);
   }
 
+  addStaticGroundCollider(width: number, yPos: number): RAPIER.Collider {
+    const bodyDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(0, yPos, 0);
+    const body = this.addRigidBody(bodyDesc);
+    const colliderDesc = RAPIER.ColliderDesc.cuboid(width / 2, 0.5, width / 2);
+    return this.addCollider(colliderDesc, body);
+  }
+
   raycast(
     origin: { x: number; y: number; z: number },
     direction: { x: number; y: number; z: number },
@@ -32,6 +39,17 @@ export class PhysicsWorld {
   ): RAPIER.RayColliderIntersection | null {
     const ray = new RAPIER.Ray(origin, direction);
     return this.world.castRayAndGetNormal(ray, maxDist, true);
+  }
+
+  /** Returns all colliders intersecting a ray (useful for wall-run detection) */
+  raycastAll(
+    origin: { x: number; y: number; z: number },
+    direction: { x: number; y: number; z: number },
+    maxDist: number,
+  ): RAPIER.RayColliderIntersection[] {
+    const ray = new RAPIER.Ray(origin, direction);
+    const hits = this.world.castRayAndGetNormal(ray, maxDist, true);
+    return hits ? [hits] : [];
   }
 
   isInitialized(): boolean {

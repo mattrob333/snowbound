@@ -1,20 +1,20 @@
 # Snowbound — Task Board
 
 ## Phase 0: Repo foundation
-- [ ] Create Vite vanilla-ts project
-- [ ] Install all dependencies
-- [ ] Add full folder structure
-- [ ] Add ESLint, Prettier, Vitest config
-- [ ] `npm run check` passes
-- [ ] Blank three.js scene renders in browser
+- [x] Create Vite vanilla-ts project
+- [x] Install all dependencies
+- [x] Add full folder structure
+- [x] Add ESLint, Prettier, Vitest config
+- [x] `npm run check` passes
+- [x] Blank three.js scene renders in browser
 
 ## Phase 1: Basic renderer and camera
-- [ ] ThreeRenderer with scene, camera, renderer
-- [ ] Resize handling
-- [ ] Hemisphere + directional lights
-- [ ] Fog
-- [ ] Placeholder snow ground plane
-- [ ] Debug grid
+- [x] ThreeRenderer with scene, camera, renderer
+- [x] Resize handling
+- [x] Hemisphere + directional lights
+- [x] Fog
+- [x] Placeholder snow ground plane
+- [x] Debug grid
 
 ## Phase 2: Physics foundation
 - [ ] Rapier async init

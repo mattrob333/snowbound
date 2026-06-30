@@ -3,15 +3,15 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** Phase 0 — Repo foundation (setting up Vite project)
+**Status:** Phase 2 — Physics foundation (adding static ground collider)
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 10m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
 - Outer Loop (supervisor) — every 60m: active supervisor (audits + writes corrections + trivial fixes + escalation).
 
 ## Phases / Waves
-1. [ ] Phase 0 — Repo foundation (Vite, deps, blank three.js scene)
-2. [ ] Phase 1 — Basic renderer and camera
+1. [x] Phase 0 — Repo foundation (Vite, deps, blank three.js scene)
+2. [x] Phase 1 — Basic renderer and camera
 3. [ ] Phase 2 — Physics foundation
 4. [ ] Phase 3 — Player vertical slice
 5. [ ] Phase 4 — Slide and wall-run
@@ -24,13 +24,14 @@
 12. [ ] Phase 11 — Audio, animation, polish
 
 ## Completed Tasks
-_(none yet)_
+- **Phase 0:** Vite vanilla-ts project, all deps installed, full folder structure, ESLint/Prettier/Vitest config, `npm run check` passes
+- **Phase 1:** ThreeRenderer (scene/camera/renderer/resize), HemisphereLight + DirectionalLight, fog, placeholder snow ground, debug grid
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Create Vite vanilla-ts project, install deps, build folder structure, render a blank three.js scene.
+- Add static ground collider to PhysicsWorld matching the snow plane, add a PhysicsDebug overlay, add a simple physics test
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
