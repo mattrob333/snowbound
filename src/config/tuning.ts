@@ -10,6 +10,7 @@ export const PLAYER_TUNING = {
   slideSpeed: 11,
   slideDuration: 0.75,
   wallRunDuration: 1.1,
+  wallRunCooldown: 0.5,
   wallRunGravityScale: 0.25,
   wallRunMinSpeed: 6.0,
   stumbleDuration: 0.65,

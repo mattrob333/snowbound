@@ -34,12 +34,12 @@
 - [x] Third-person follow camera
 
 ## Phase 4: Slide and wall-run
-- [ ] Slide state + collider change
-- [ ] Low obstacle test
-- [ ] Wall-run raycasts
-- [ ] Wall-run state
-- [ ] Wall jump exit
-- [ ] Cooldowns
+- [x] Slide state + collider change
+- [x] Low obstacle test
+- [x] Wall-run raycasts
+- [x] Wall-run state
+- [x] Wall jump exit
+- [x] Cooldowns
 
 ## Phase 5: Level data loader
 - [ ] LevelData interfaces

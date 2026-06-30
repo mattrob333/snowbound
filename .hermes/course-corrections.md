@@ -15,10 +15,10 @@ _(none — inner loop in alignment as of last audit)_
 
 ## Resolved Corrections
 
-### BLOCKER — Wrong import path in PlayerMovementState.test.ts — RESOLVED (commit <pending>)
+### BLOCKER — Wrong import path in PlayerMovementState.test.ts — RESOLVED (commit e2eb713)
 Fix: Changed line 2 from `'../../gameplay/player/PlayerMovementState'` to `'../gameplay/player/PlayerMovementState'`.
 
-### HIGH — SlideController.test.ts shared PhysicsWorld causes test pollution — RESOLVED (commit <pending>)
+### HIGH — SlideController.test.ts shared PhysicsWorld causes test pollution — RESOLVED (commit e2eb713)
 Fix: Added `removeRigidBody` to PhysicsWorld, stored PhysicsWorld ref in CharacterKCC, implemented `dispose()` removing rigid body, added `kcc.dispose()` calls after each test.
 
 _(history appended below)_

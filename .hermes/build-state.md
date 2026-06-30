@@ -3,7 +3,7 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** Phase 3 complete — Phase 4 next (Slide and wall-run)
+**Status:** Phase 4 complete — Phase 5 next (Level data loader)
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 10m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
@@ -13,9 +13,9 @@
 1. [x] Phase 0 — Repo foundation (Vite, deps, blank three.js scene)
 2. [x] Phase 1 — Basic renderer and camera
 3. [x] Phase 2 — Physics foundation
-4. [x] Phase 3 — Player vertical slice
-5. [ ] Phase 4 — Slide and wall-run
-6. [ ] Phase 5 — Level data loader
+|4. [x] Phase 3 — Player vertical slice
+|5. [x] Phase 4 — Slide and wall-run
+|6. [ ] Phase 5 — Level data loader
 7. [ ] Phase 6 — Pickups and objectives
 8. [ ] Phase 7 — Monster chase director
 9. [ ] Phase 8 — Hazard system
@@ -28,12 +28,13 @@
 - **Phase 1:** ThreeRenderer (scene/camera/renderer/resize), HemisphereLight + DirectionalLight, fog, placeholder snow ground, debug grid
 - **Phase 2:** Rapier async init, PhysicsWorld, static ground collider, CollisionGroups, PhysicsDebug overlay, raycast helper, tests
 - **Phase 3:** CharacterKCC (Rapier kinematic controller), PlayerController (WASD+sprint+jump), functional InputManager, ThirdPersonCameraRig, Player entity, wired into GameApp/GameLoop. 23 tests passing (6 suites).
+- **Phase 4:** SlideController + WallRunController wired into PlayerController, setColliderHalfHeight on CharacterKCC (collider change for slide), wall-run raycasts + state + wall jump + cooldowns, low obstacle slide test. 50 tests passing (9 suites).
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 4: Slide state + collider change, wall-run raycasts, wall-run state, wall jump exit, cooldowns — write tests first
+- Phase 5: Level data loader — LevelData interfaces, load level-01.json, spawn terrain/obstacles/part/safe zone from JSON, level unload
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -42,5 +43,6 @@ _(none yet)_
 - Placeholder-first: use Three.js primitives (capsule, box, sphere) for all characters until Phase 11.
 - Levels are data-driven via JSON — never hardcode level geometry in gameplay systems.
 - enum keyword is banned by tsconfig's `erasableSyntaxOnly: true` — use const objects + type alias pattern.
+- Use separate `describe` blocks with separate PhysicsWorld instances for integration tests to avoid leftover KCC rigid body pollution.
 
-**Last Updated:** 2026-06-30 — Phase 3 complete (Player vertical slice), Phase 4 next
+**Last Updated:** 2026-06-30 — Phase 4 complete (Slide and wall-run), Phase 5 next

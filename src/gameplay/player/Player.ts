@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { CharacterKCC } from '../../engine/physics/CharacterKCC';
 import { PlayerController } from './PlayerController';
+import { SlideController } from './SlideController';
+import { WallRunController } from './WallRunController';
 import { ThirdPersonCameraRig } from '../../engine/camera/ThirdPersonCameraRig';
 import type { PhysicsWorld } from '../../engine/physics/PhysicsWorld';
 import type { GameContext } from '../../app/GameContext';
@@ -10,11 +12,15 @@ export class Player {
   readonly mesh: THREE.Mesh;
   readonly kcc: CharacterKCC;
   readonly controller: PlayerController;
+  readonly slideController: SlideController;
+  readonly wallRunController: WallRunController;
   private cameraRig: ThirdPersonCameraRig;
 
   constructor(physics: PhysicsWorld, cameraRig: ThirdPersonCameraRig) {
     this.kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
-    this.controller = new PlayerController(this.kcc);
+    this.slideController = new SlideController();
+    this.wallRunController = new WallRunController();
+    this.controller = new PlayerController(this.kcc, physics, this.slideController, this.wallRunController);
     this.cameraRig = cameraRig;
 
     // Visual capsule placeholder

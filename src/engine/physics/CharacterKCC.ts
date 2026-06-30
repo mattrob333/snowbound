@@ -7,6 +7,8 @@ export class CharacterKCC {
   private characterBody: RAPIER.RigidBody;
   private _grounded = false;
   private physics: PhysicsWorld;
+  private readonly radius: number;
+  private readonly originalHalfHeight: number;
 
   constructor(
     physics: PhysicsWorld,
@@ -14,6 +16,8 @@ export class CharacterKCC {
     radius: number,
   ) {
     this.physics = physics;
+    this.radius = radius;
+    this.originalHalfHeight = height / 2 - radius;
     this.controller = new RAPIER.KinematicCharacterController(
       0.01,
       physics.world.integrationParameters,
@@ -34,8 +38,26 @@ export class CharacterKCC {
     this.characterBody = physics.addRigidBody(bodyDesc);
 
     // Capsule collider for the character
-    const colliderDesc = RAPIER.ColliderDesc.capsule(height / 2 - radius, radius);
+    const colliderDesc = RAPIER.ColliderDesc.capsule(this.originalHalfHeight, radius);
     this.characterCollider = physics.addCollider(colliderDesc, this.characterBody);
+  }
+
+  /** Replace the capsule collider with one of a different half-height.
+   *  Useful for crouching/sliding where the player needs a shorter hitbox. */
+  setColliderHalfHeight(halfHeight: number): void {
+    this.physics.world.removeCollider(this.characterCollider, true);
+    const newDesc = RAPIER.ColliderDesc.capsule(halfHeight, this.radius);
+    this.characterCollider = this.physics.addCollider(newDesc, this.characterBody);
+  }
+
+  /** Restore the collider to the original full-height capsule. */
+  resetColliderHeight(): void {
+    this.setColliderHalfHeight(this.originalHalfHeight);
+  }
+
+  /** Get the collider's Y translation offset so external code can position visuals correctly. */
+  getColliderOffsetY(): number {
+    return this.originalHalfHeight;
   }
 
   setPosition(pos: { x: number; y: number; z: number }): void {
