@@ -1,0 +1,32 @@
+{
+  "name": "snowbound",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "check": "npm run lint && npm run test && npm run build",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/three": "^0.185.0",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.4",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.62.1",
+    "vite": "^8.1.1",
+    "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.19.3",
+    "three": "^0.185.0",
+    "zustand": "^5.0.14"
+  }
+}
