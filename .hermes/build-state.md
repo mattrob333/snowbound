@@ -3,7 +3,7 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** Phase 4 complete — Phase 5 next (Level data loader)
+**Status:** Phase 6 in progress — HUD objective text + part-required safe zone done
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 10m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
@@ -30,14 +30,13 @@
 - **Phase 3:** CharacterKCC (Rapier kinematic controller), PlayerController (WASD+sprint+jump), functional InputManager, ThirdPersonCameraRig, Player entity, wired into GameApp/GameLoop. 23 tests passing (6 suites).
 - **Phase 4:** SlideController + WallRunController wired into PlayerController, setColliderHalfHeight on CharacterKCC (collider change for slide), wall-run raycasts + state + wall jump + cooldowns, low obstacle slide test. 50 tests passing (9 suites).
 - **Phase 5:** LevelData interfaces, LevelLoader (spawn terrain/obstacles/part/safe zone/hazards), LevelManager (load/unload lifecycle), RoutePath (waypoint path + closest progress), level-01.json (Crash Site), LevelLoader.test.ts (11 tests). 77 tests passing (11 suites).
-- **Phase 6:** EntityManager (entity tracking: add/remove/clear/update), Pickup base entity (Rapier sensor + onCollect callback + dispose, proximity detection via Pickup.update()), HelicopterPartPickup (glowing rotating cube, partId). 92 tests passing (13 suites).
+- **Phase 6:** EntityManager (entity tracking: add/remove/clear/update), Pickup base entity (Rapier sensor + onCollect callback + dispose, proximity detection via Pickup.update()), HelicopterPartPickup (glowing rotating cube, partId), Hud.ts (DOM-based objective text overlay — find part / return to safe zone / level complete states), SafeZone.ts (entity detecting player overlap + part-collected check, fires onLevelComplete/onPlayerEnter/onPlayerExit), SafeZone.test.ts (8 tests for detection, completion, enter/exit, double-fire prevention). 100 tests passing (14 suites).
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 6: HUD objective text — show in-game text overlay for current objective (find helicopter part, deliver to safe zone)
-- Phase 6: Part required for safe zone — safe zone only triggers completion when part is collected
+- Phase 6: Temporary power-up effect / permanent upgrade effect — Pickup that grants speed boost or dog repel when collected
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -47,5 +46,8 @@ _(none yet)_
 - Levels are data-driven via JSON — never hardcode level geometry in gameplay systems.
 - enum keyword is banned by tsconfig's `erasableSyntaxOnly: true` — use const objects + type alias pattern.
 - Use separate `describe` blocks with separate PhysicsWorld instances for integration tests to avoid leftover KCC rigid body pollution.
+- Hud.ts creates DOM elements — may need jsdom environment for unit tests. SafeZone tests work with `null` renderer.
+- When adding entities that create physics bodies, remove them in `dispose()` to prevent test pollution.
+- The HelicopterPartPickup creates its own mesh+body via Pickup. LevelLoader also spawns a raw part mesh+body — this creates duplicates. Next refactor: remove raw part/safezone spawning from LevelLoader and rely on entities only.
 
-**Last Updated:** 2026-06-30 — Phase 6: Pickup detection wired via Pickup.update() proximity check (92 tests)
+**Last Updated:** 2026-06-30 — Phase 6: HUD objective text + part-required safe zone + SafeZone tests (100 tests)

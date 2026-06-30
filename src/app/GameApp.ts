@@ -12,6 +12,7 @@ import { GameLoop } from './GameLoop';
 import { SceneStateMachine, AppState } from './SceneStateMachine';
 import { Player } from '../gameplay/player/Player';
 import { ThirdPersonCameraRig } from '../engine/camera/ThirdPersonCameraRig';
+import { Hud } from '../gameplay/ui/Hud';
 import { CAMERA_DISTANCE } from '../config/constants';
 import type { GameContext } from './GameContext';
 
@@ -19,12 +20,16 @@ export class GameApp {
   private ctx!: GameContext;
   private stateMachine = new SceneStateMachine();
   private loop = new GameLoop();
+  private hud = new Hud();
 
   async init(container: HTMLElement): Promise<void> {
     console.log('[Snowbound] Initializing...');
 
     const renderer = new ThreeRenderer();
     container.appendChild(renderer.renderer.domElement);
+
+    // Attach HUD overlay to the container
+    this.hud.attach(container);
 
     // Attach input to window
     const input = new InputManager();
@@ -97,8 +102,15 @@ export class GameApp {
       clock: { elapsed: 0, delta: 0 },
     };
 
+    // Load the first level (level-01) with entity manager for pickups/safe zone
+    levelManager.loadLevel('level-01', entityManager, () => {
+      player.partCollected = true;
+    }).catch((err) => {
+      console.error('[Snowbound] Failed to load level-01:', err);
+    });
+
     this.stateMachine.setState(AppState.Boot);
     console.log('[Snowbound] Ready. Starting game loop.');
-    this.loop.start(this.ctx);
+    this.loop.start(this.ctx, () => this.hud.update(this.ctx.clock.delta, this.ctx));
   }
 }

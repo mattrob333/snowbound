@@ -54,9 +54,9 @@
 - [x] GameEntity interface (IGameEntity) + EntityManager tracking (add/remove/clear/update)
 - [x] Pickup sensor — Pickup base entity (Rapier sensor body, collected state, onCollect callback, dispose)
 - [x] Helicopter part pickup — HelicopterPartPickup (glowing rotating cube, partId)
-- [x] Pickup detection in game loop (proximity check via Pickup.update() against player KCC position)
-- [ ] HUD objective text
-- [ ] Part required for safe zone
+|- [x] Pickup detection in game loop (proximity check via Pickup.update() against player KCC position)
+- [x] HUD objective text — Hud.ts with DOM overlay showing objective state
+- [x] Part required for safe zone — SafeZone.ts entity, wired into LevelManager
 - [ ] Temporary power-up effect
 - [ ] Permanent upgrade effect
 

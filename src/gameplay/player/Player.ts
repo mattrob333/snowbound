@@ -16,6 +16,14 @@ export class Player {
   readonly wallRunController: WallRunController;
   private cameraRig: ThirdPersonCameraRig;
 
+  /** Whether the player has collected the level's helicopter part */
+  partCollected = false;
+
+  /** Reset per-level state (called when loading a new level) */
+  resetLevelState(): void {
+    this.partCollected = false;
+  }
+
   constructor(physics: PhysicsWorld, cameraRig: ThirdPersonCameraRig) {
     this.kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
     this.slideController = new SlideController();

@@ -5,10 +5,12 @@ export class GameLoop {
   private accumulator = 0;
   private lastTime = 0;
   private running = false;
+  private onFrameCallback: ((ctx: GameContext) => void) | null = null;
 
-  start(ctx: GameContext): void {
+  start(ctx: GameContext, onFrame?: (ctx: GameContext) => void): void {
     this.running = true;
     this.lastTime = performance.now();
+    this.onFrameCallback = onFrame ?? null;
     requestAnimationFrame((time) => this.tick(time, ctx));
   }
 
@@ -35,6 +37,9 @@ export class GameLoop {
       this.accumulator -= FIXED_DT;
       steps++;
     }
+
+    // Run per-frame callback (HUD update, etc.) before rendering
+    this.onFrameCallback?.(ctx);
 
     ctx.renderer.render();
     requestAnimationFrame((time) => this.tick(time, ctx));
