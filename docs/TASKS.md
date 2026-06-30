@@ -27,10 +27,11 @@
 ## Phase 3: Player vertical slice
 - [x] Jim capsule placeholder (CharacterKCC)
 - [x] Kinematic character controller
-- [ ] WASD + camera-relative movement
-- [ ] Sprint
-- [ ] Jump
-- [ ] Third-person follow camera
+- [x] InputManager functional (keyboard events, ControlAction mapping)
+- [x] WASD + camera-relative movement
+- [x] Sprint
+- [x] Jump
+- [x] Third-person follow camera
 
 ## Phase 4: Slide and wall-run
 - [ ] Slide state + collider change
