@@ -11,7 +11,7 @@ The INNER loop reads this FIRST every tick and resolves OPEN corrections as top 
 ---
 
 ## Open Corrections
-_(none — inner loop in alignment as of last audit)_
+_(none — inner loop in alignment as of this audit)_
 
 ## Resolved Corrections
 
@@ -20,5 +20,9 @@ Fix: Changed line 2 from `'../../gameplay/player/PlayerMovementState'` to `'../g
 
 ### HIGH — SlideController.test.ts shared PhysicsWorld causes test pollution — RESOLVED (commit e2eb713)
 Fix: Added `removeRigidBody` to PhysicsWorld, stored PhysicsWorld ref in CharacterKCC, implemented `dispose()` removing rigid body, added `kcc.dispose()` calls after each test.
+
+### HIGH — Rapier 0.19 API mismatch: drainIntersectionEvents not available, Pickup tests broken — RESOLVED (commit 176fef4)
+Problem: Builder committed Pickup.test.ts using `drainIntersectionEvents` which doesn't exist in Rapier 0.19.x (the installed version). Only `drainCollisionEvents` exists on EventQueue. Additionally, sensor events via event queue are unreliable in 0.19 compat. Result: 3 tests failing, typecheck failing, quality gate red.
+Fix: Changed PhysicsWorld.ts to use `drainCollisionEvents` internally (matching Rapier 0.19 API), added `boxesOverlap()` method for position-based proximity detection, rewrote Pickup.test.ts to use manual AABB overlap checks instead of event-queue-based sensor detection. All 89 tests pass, typecheck + lint + build clean.
 
 _(history appended below)_
