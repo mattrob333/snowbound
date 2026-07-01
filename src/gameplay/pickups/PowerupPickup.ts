@@ -67,6 +67,9 @@ export class PowerupPickup extends Pickup {
     this.powerupType = powerupType;
     this.duration = duration ?? DEFAULT_DURATIONS[powerupType];
 
+    // Distinct pickup sound for powerups
+    this.soundKey = 'powerup';
+
     // Type-specific visual
     const colors = POWERUP_COLORS[powerupType];
     const geometry = new THREE.BoxGeometry(0.35, 0.35, 0.35);
@@ -106,6 +109,8 @@ export class PowerupPickup extends Pickup {
       if (this.timeRemaining <= 0) {
         this.timeRemaining = 0;
         this.active = false;
+        // Play deactivation sound
+        try { _ctx.audio?.play('powerup_expire', 'sfx'); } catch { /* silent fallback */ }
         this.onDeactivate?.(this.powerupType);
       }
     }

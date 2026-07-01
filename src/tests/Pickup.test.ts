@@ -147,6 +147,11 @@ describe('Pickup sensor proximity detection', () => {
 
 describe('Pickup entity detection via Pickup.update()', () => {
   let physics: PhysicsWorld;
+  /** Minimal AudioManager mock for testing pickup sounds */
+  const mockAudio = {
+    play: () => ({ id: 'mock', stop: () => {}, setVolume: () => {}, setLoop: () => {} }),
+    init: () => {},
+  } as any;
 
   beforeAll(async () => {
     physics = new PhysicsWorld();
@@ -166,7 +171,7 @@ describe('Pickup entity detection via Pickup.update()', () => {
     kcc.setPosition({ x: 0, y: 1, z: 0 });
 
     // Build a minimal GameContext with just the player
-    const ctx = { player: { kcc } } as any;
+    const ctx = { player: { kcc }, audio: mockAudio } as any;
 
     // Simulate one frame — player at the same position as pickup
     physics.step(1 / 60);
@@ -189,7 +194,7 @@ describe('Pickup entity detection via Pickup.update()', () => {
     const kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
     kcc.setPosition({ x: 0, y: 1, z: 0 });
 
-    const ctx = { player: { kcc } } as any;
+    const ctx = { player: { kcc }, audio: mockAudio } as any;
 
     physics.step(1 / 60);
     pickup.update(1 / 60, ctx);
@@ -212,7 +217,7 @@ describe('Pickup entity detection via Pickup.update()', () => {
     const kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
     kcc.setPosition({ x: 0, y: 1, z: 0 });
 
-    const ctx = { player: { kcc } } as any;
+    const ctx = { player: { kcc }, audio: mockAudio } as any;
 
     physics.step(1 / 60);
 
@@ -224,6 +229,36 @@ describe('Pickup entity detection via Pickup.update()', () => {
     // Second frame — sustained overlap, should NOT call again
     pickup.update(1 / 60, ctx);
     expect(collectCount).toBe(1);
+
+    kcc.dispose();
+    pickup.dispose();
+  });
+
+  it('should play pickup sound on collection via ctx.audio', async () => {
+    const { Pickup } = await import('../gameplay/pickups/Pickup');
+    const pickup = new Pickup(
+      physics, null, { x: 0, y: 1, z: 4 },
+    );
+
+    const { CharacterKCC } = await import('../engine/physics/CharacterKCC');
+    const kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
+    kcc.setPosition({ x: 0, y: 1, z: 4 });
+
+    // Track audio play calls
+    const playedSounds: string[] = [];
+    const audio = {
+      play: (key: string, _type: string) => {
+        playedSounds.push(key);
+        return { id: 'mock', stop: () => {}, setVolume: () => {}, setLoop: () => {} };
+      },
+    } as any;
+
+    const ctx = { player: { kcc }, audio } as any;
+    physics.step(1 / 60);
+    pickup.update(1 / 60, ctx);
+
+    expect(pickup.collected).toBe(true);
+    expect(playedSounds).toContain('pickup');
 
     kcc.dispose();
     pickup.dispose();

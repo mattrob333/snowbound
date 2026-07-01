@@ -19,6 +19,9 @@ export class Pickup implements IGameEntity {
   protected mesh: THREE.Mesh | null = null;
   private _collected = false;
 
+  /** Sound key played on collection — subclasses can override for distinct sounds */
+  protected soundKey = 'pickup';
+
   /** Callback fired once when the player overlaps this pickup */
   onCollect: (() => void) | null = null;
 
@@ -70,6 +73,8 @@ export class Pickup implements IGameEntity {
         { x: playerPos.x, y: playerPos.y, z: playerPos.z }, playerHalf,
       )) {
         this.collect();
+        // Play pickup sound using subclass-specific soundKey
+        try { ctx.audio?.play(this.soundKey, 'sfx'); } catch { /* silent fallback */ }
       }
     }
   }

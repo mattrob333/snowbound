@@ -152,6 +152,45 @@ describe('PowerupPickup activation and duration', () => {
     pickup.dispose();
   });
 
+  it('should play powerup_expire sound on deactivation', async () => {
+    const { PowerupPickup, PowerupType } = await import('../gameplay/pickups/PowerupPickup');
+    const pickup = new PowerupPickup(
+      physics, null, { x: 0, y: 1, z: 9 }, PowerupType.Shield, 0.5,
+    );
+
+    const { CharacterKCC } = await import('../engine/physics/CharacterKCC');
+    const kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
+    kcc.setPosition({ x: 0, y: 1, z: 9 });
+
+    // Track audio play calls
+    const playedSounds: string[] = [];
+    const audio = {
+      play: (key: string, _type: string) => {
+        playedSounds.push(key);
+        return { id: 'mock', stop: () => {}, setVolume: () => {}, setLoop: () => {} };
+      },
+    } as any;
+
+    const ctx = { player: { kcc }, audio } as any;
+    physics.step(1 / 60);
+    pickup.update(1 / 60, ctx);
+
+    // Should have played 'powerup' on collection
+    expect(playedSounds).toContain('powerup');
+
+    // Simulate frames until expired (0.5s duration = 30 frames at 1/60)
+    for (let i = 0; i < 35; i++) {
+      pickup.update(1 / 60, ctx);
+    }
+
+    // Should now have played 'powerup_expire' on deactivation
+    expect(playedSounds).toContain('powerup_expire');
+    expect(pickup.active).toBe(false);
+
+    kcc.dispose();
+    pickup.dispose();
+  });
+
   it('should NOT collect twice or re-activate', async () => {
     const { PowerupPickup, PowerupType } = await import('../gameplay/pickups/PowerupPickup');
     const pickup = new PowerupPickup(

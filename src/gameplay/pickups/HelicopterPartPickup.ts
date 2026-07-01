@@ -20,6 +20,9 @@ export class HelicopterPartPickup extends Pickup {
     super(physics, renderer, position);
     this.partId = partId;
 
+    // Distinct pickup sound for helicopter parts
+    this.soundKey = 'helicopter_part';
+
     // Glowing rotating cube as placeholder visual
     const geometry = new THREE.BoxGeometry(0.4, 0.4, 0.4);
     const material = new THREE.MeshStandardMaterial({

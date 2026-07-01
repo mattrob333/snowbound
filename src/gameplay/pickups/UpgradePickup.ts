@@ -38,6 +38,9 @@ export class UpgradePickup extends Pickup {
     this.upgradeService = upgradeService;
     this.upgradeType = upgradeType;
 
+    // Distinct pickup sound for permanent upgrades
+    this.soundKey = 'upgrade';
+
     // Type-specific visual: octahedron with glow
     const colors = UPGRADE_COLORS[upgradeType] ?? { color: 0xffffff, emissive: 0x444444 };
     const geometry = new THREE.OctahedronGeometry(0.3);
