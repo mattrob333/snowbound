@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "id": "level-06",
+    "name": "Avalanche Pass",
+    "description": "The dog triggered an avalanche! Sprint through the pass, dodge falling snow and ice, and find the radio to call for help.",
+    "order": 6
+  },
+  "atmosphere": {
+    "fogColor": 13421772,
+    "fogDensity": 0.01,
+    "ambientIntensity": 0.4,
+    "directionalIntensity": 0.6
+  },
+  "playerSpawn": { "x": 0, "y": 2, "z": -8 },
+  "terrain": [
+    { "position": { "x": 0, "y": -0.5, "z": 0 }, "halfExtents": { "x": 8, "y": 0.5, "z": 6 }, "rotationY": 0, "color": 14277081 },
+    { "position": { "x": 0, "y": 0, "z": 10 }, "halfExtents": { "x": 5, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 13684944 },
+    { "position": { "x": 8, "y": 0, "z": 16 }, "halfExtents": { "x": 4, "y": 0.25, "z": 4 }, "rotationY": 0.2, "color": 13684944 },
+    { "position": { "x": -8, "y": 0, "z": 22 }, "halfExtents": { "x": 4, "y": 0.25, "z": 4 }, "rotationY": -0.2, "color": 13684944 },
+    { "position": { "x": 0, "y": 0.5, "z": 28 }, "halfExtents": { "x": 8, "y": 0.25, "z": 6 }, "rotationY": 0, "color": 14737632 },
+    { "position": { "x": 12, "y": 0.5, "z": 10 }, "halfExtents": { "x": 1.5, "y": 0.125, "z": 1.5 }, "rotationY": 0, "color": 10526880 },
+    { "position": { "x": -12, "y": 0.5, "z": 18 }, "halfExtents": { "x": 1.5, "y": 0.125, "z": 1.5 }, "rotationY": 0, "color": 10526880 }
+  ],
+  "obstacles": [
+    { "type": "jump_over", "position": { "x": 0, "y": 0.5, "z": 4 }, "halfExtents": { "x": 4, "y": 0.5, "z": 0.8 }, "color": 12434877 },
+    { "type": "slide_under", "position": { "x": 0, "y": 1.8, "z": 8 }, "halfExtents": { "x": 4, "y": 0.2, "z": 0.8 }, "color": 8947848 },
+    { "type": "jump_over", "position": { "x": 3, "y": 0.5, "z": 13 }, "halfExtents": { "x": 2, "y": 0.5, "z": 0.8 }, "color": 12434877 },
+    { "type": "jump_over", "position": { "x": -3, "y": 0.5, "z": 20 }, "halfExtents": { "x": 2.5, "y": 0.5, "z": 0.8 }, "color": 12434877 },
+    { "type": "slide_under", "position": { "x": 0, "y": 1.8, "z": 25 }, "halfExtents": { "x": 5, "y": 0.2, "z": 0.8 }, "color": 8947848 }
+  ],
+  "dogRoute": [
+    { "position": { "x": 0, "y": 0, "z": -25 } },
+    { "position": { "x": 0, "y": 0, "z": -10 } },
+    { "position": { "x": 0, "y": 0, "z": 0 } },
+    { "position": { "x": 0, "y": 0, "z": 10 } },
+    { "position": { "x": 8, "y": 0, "z": 16 } },
+    { "position": { "x": -8, "y": 0, "z": 22 } },
+    { "position": { "x": 0, "y": 0.5, "z": 30 } }
+  ],
+  "dogTuning": {
+    "patrolSpeed": 4.5,
+    "chaseSpeed": 10.0,
+    "catchRadius": 1.2,
+    "patrolDistance": 9.0
+  },
+  "helicopterPart": {
+    "position": { "x": 0, "y": 2, "z": 15 },
+    "partId": "radio"
+  },
+  "safeZone": {
+    "position": { "x": 0, "y": 1.5, "z": 32 },
+    "radius": 3,
+    "requiresPart": true
+  },
+  "powerups": [
+    { "position": { "x": 12, "y": 1, "z": 10 }, "type": "speed_boost", "duration": 6 },
+    { "position": { "x": -12, "y": 1, "z": 18 }, "type": "shield", "duration": 8 }
+  ],
+  "hazards": [
+    { "type": "avalanche", "position": { "x": 0, "y": 10, "z": 12 }, "halfExtents": { "x": 10, "y": 0.5, "z": 5 }, "triggerRadius": 8, "fallDelay": 2.0, "color": 14737632 },
+    { "type": "falling_ice", "position": { "x": 3, "y": 6, "z": 5 }, "halfExtents": { "x": 0.8, "y": 1.5, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 1.0, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": -3, "y": 6, "z": 18 }, "halfExtents": { "x": 0.8, "y": 1.5, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 0.8, "color": 13553358 },
+    { "type": "cracked_ice", "position": { "x": 4, "y": 0.25, "z": 2 }, "halfExtents": { "x": 1.5, "y": 0.08, "z": 1.5 }, "color": 8966399 }
+  ]
+}

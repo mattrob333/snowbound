@@ -86,11 +86,11 @@
 - [x] Reset save option
 
 ## Phase 10: Build all 15 levels
-- [ ] Level 1 — Crash Site (rotor blade, basic run/jump)
-- [ ] Level 2 — Frozen Forest (battery, fallen trees)
-- [ ] Level 3 — Snowy Cliffs (landing skid, wall-run intro)
-- [ ] Level 4 — Ice River (fuel pump, sliding ice)
-- [ ] Level 5 — Ice Caves (tail rotor, falling ice)
+- [x] Level 1 — Crash Site (rotor blade, basic run/jump)
+- [x] Level 2 — Frozen Forest (battery, fallen trees)
+- [x] Level 3 — Snowy Cliffs (landing skid, wall-run intro)
+- [x] Level 4 — Ice River (fuel pump, sliding ice)
+- [x] Level 5 — Ice Caves (tail rotor, falling ice)
 - [ ] Level 6 — Avalanche Pass (radio, timed escape)
 - [ ] Level 7 — Frozen Village (fuel line, doors+distractions)
 - [ ] Level 8 — Rope Bridge Canyon (cockpit controls, collapsing bridges)

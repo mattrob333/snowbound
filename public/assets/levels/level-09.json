@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "id": "level-09",
+    "name": "Blizzard Mountain",
+    "description": "A blinding blizzard reduces visibility. Navigate by the dim glow of emergency beacons and find the navigation computer.",
+    "order": 9
+  },
+  "atmosphere": {
+    "fogColor": 14737632,
+    "fogDensity": 0.025,
+    "ambientIntensity": 0.3,
+    "directionalIntensity": 0.4
+  },
+  "playerSpawn": { "x": 0, "y": 2, "z": -6 },
+  "terrain": [
+    { "position": { "x": 0, "y": -0.5, "z": 0 }, "halfExtents": { "x": 6, "y": 0.5, "z": 4 }, "rotationY": 0, "color": 14277081 },
+    { "position": { "x": 6, "y": 0, "z": 6 }, "halfExtents": { "x": 3, "y": 0.25, "z": 3 }, "rotationY": 0.2, "color": 13684944 },
+    { "position": { "x": -6, "y": 0, "z": 12 }, "halfExtents": { "x": 3, "y": 0.25, "z": 3 }, "rotationY": -0.2, "color": 13684944 },
+    { "position": { "x": 8, "y": 0.5, "z": 18 }, "halfExtents": { "x": 3, "y": 0.25, "z": 3 }, "rotationY": 0.15, "color": 14277081 },
+    { "position": { "x": -6, "y": 0.5, "z": 24 }, "halfExtents": { "x": 4, "y": 0.25, "z": 4 }, "rotationY": -0.1, "color": 14277081 },
+    { "position": { "x": 0, "y": 1, "z": 30 }, "halfExtents": { "x": 6, "y": 0.25, "z": 5 }, "rotationY": 0, "color": 14737632 },
+    { "position": { "x": 3, "y": 0.5, "z": 9 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 10526880 },
+    { "position": { "x": -3, "y": 0.5, "z": 15 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 10526880 },
+    { "position": { "x": 0, "y": 0.5, "z": 21 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 10526880 }
+  ],
+  "obstacles": [
+    { "type": "jump_over", "position": { "x": 0, "y": 0.5, "z": 4 }, "halfExtents": { "x": 3.5, "y": 0.5, "z": 0.8 }, "color": 8947848 },
+    { "type": "slide_under", "position": { "x": 4, "y": 1.8, "z": 8 }, "halfExtents": { "x": 2.5, "y": 0.2, "z": 0.6 }, "color": 7500402 },
+    { "type": "jump_over", "position": { "x": -4, "y": 0.5, "z": 14 }, "halfExtents": { "x": 2, "y": 0.5, "z": 0.8 }, "color": 8947848 },
+    { "type": "slide_under", "position": { "x": 4, "y": 1.8, "z": 20 }, "halfExtents": { "x": 2.5, "y": 0.2, "z": 0.6 }, "color": 7500402 },
+    { "type": "jump_over", "position": { "x": -4, "y": 0.5, "z": 26 }, "halfExtents": { "x": 3, "y": 0.5, "z": 0.8 }, "color": 8947848 }
+  ],
+  "dogRoute": [
+    { "position": { "x": 0, "y": 0, "z": -22 } },
+    { "position": { "x": 0, "y": 0, "z": -8 } },
+    { "position": { "x": 0, "y": 0, "z": 0 } },
+    { "position": { "x": 6, "y": 0, "z": 6 } },
+    { "position": { "x": -6, "y": 0, "z": 12 } },
+    { "position": { "x": 8, "y": 0.5, "z": 18 } },
+    { "position": { "x": -6, "y": 0.5, "z": 24 } },
+    { "position": { "x": 0, "y": 1, "z": 32 } }
+  ],
+  "dogTuning": {
+    "patrolSpeed": 4.5,
+    "chaseSpeed": 10.5,
+    "catchRadius": 1.2,
+    "patrolDistance": 8.5
+  },
+  "helicopterPart": {
+    "position": { "x": 0, "y": 2, "z": 16 },
+    "partId": "navigation_computer"
+  },
+  "safeZone": {
+    "position": { "x": 0, "y": 1.5, "z": 33 },
+    "radius": 3,
+    "requiresPart": true
+  },
+  "powerups": [
+    { "position": { "x": 3, "y": 1, "z": 9 }, "type": "dog_repel", "duration": 6 },
+    { "position": { "x": 0, "y": 1, "z": 21 }, "type": "shield", "duration": 10 }
+  ],
+  "hazards": [
+    { "type": "cracked_ice", "position": { "x": 3, "y": 0.25, "z": 2 }, "halfExtents": { "x": 2, "y": 0.08, "z": 1.5 }, "color": 8966399 },
+    { "type": "cracked_ice", "position": { "x": -3, "y": 0.25, "z": 17 }, "halfExtents": { "x": 1.5, "y": 0.08, "z": 2 }, "color": 8966399 },
+    { "type": "falling_ice", "position": { "x": 2, "y": 5, "z": 11 }, "halfExtents": { "x": 0.8, "y": 1.2, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 0.8, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": -2, "y": 5, "z": 23 }, "halfExtents": { "x": 0.8, "y": 1.2, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 1.0, "color": 13553358 }
+  ]
+}
