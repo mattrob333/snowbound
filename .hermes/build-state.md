@@ -3,7 +3,7 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** Phase 10 complete — all 15 levels built as JSON with terrain, obstacles, dog routes, hazards, and powerups. 195 tests green.
+**Status:** Phase 11 in progress — 4 of 10 Phase 11 slices complete. 251 tests green.
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 3m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
@@ -21,26 +21,21 @@
 9. [x] Phase 8 — Hazard system
 10. [x] Phase 9 — Save and progression
 11. [x] Phase 10 — Build all 15 levels
-12. [ ] Phase 11 — Audio, animation, polish
+12. [ ] Phase 11 — Audio, animation, polish (4/10 tasks done — 251 tests)
 
 ## Completed Tasks
-- **Phase 0:** Vite vanilla-ts project, all deps installed, full folder structure, ESLint/Prettier/Vitest config, `npm run check` passes
-- **Phase 1:** ThreeRenderer (scene/camera/renderer/resize), HemisphereLight + DirectionalLight, fog, placeholder snow ground, debug grid
-- **Phase 2:** Rapier async init, PhysicsWorld, static ground collider, CollisionGroups, PhysicsDebug overlay, raycast helper, tests
-- **Phase 3:** CharacterKCC (Rapier kinematic controller), PlayerController (WASD+sprint+jump), functional InputManager, ThirdPersonCameraRig, Player entity, wired into GameApp/GameLoop. 23 tests passing (6 suites).
-- **Phase 4:** SlideController + WallRunController wired into PlayerController, setColliderHalfHeight on CharacterKCC (collider change for slide), wall-run raycasts + state + wall jump + cooldowns, low obstacle slide test. 50 tests passing (9 suites).
-- **Phase 5:** LevelData interfaces, LevelLoader (spawn terrain/obstacles/part/safe zone/hazards), LevelManager (load/unload lifecycle), RoutePath (waypoint path + closest progress), level-01.json (Crash Site), LevelLoader.test.ts (11 tests). 77 tests passing (11 suites).
-- **Phase 6:** EntityManager, Pickup base, HelicopterPartPickup, Hud.ts, SafeZone.ts, PowerupPickup (temporary effects: speed_boost/dog_repel/shield/magnet with duration tracking, activation/deactivation callbacks), PlayerUpgradeService (permanent upgrade tracking with combined stat multipliers), UpgradePickup (permanent upgrade entity with type-specific octahedron visuals). 120 tests passing (16 suites).
-- **Phase 7:** MonsterChaseDirector + MonsterDog (brown capsule, route-based movement with patrol/chase states) + MonsterDistanceModel (gap calculation with close/catch thresholds, configurable). Dog moves along route waypoints; stays patrolDistance behind player during patrol; chases at chaseSpeed after part pickup; catch condition fires onCatchPlayer callback. Hud.ts: dog close warning element (red bottom bar, fades in when dog ≤ 8 units). Dog collision group added to CollisionGroups. 152 tests passing (19 suites).
-- **Phase 8:** Hazard base class (IGameEntity, template-method with trigger-radius detection, activate/spent lifecycle). FallingIceHazard (trigger zone + delayed falling ice block with icosahedron visual + dynamic physics body + onMajorHazard callback). CrackedIceHazard (stumble zone with cracked-color visual update + timer-based lifecycle). Dog gap penalty (hazards advance dog progress via MonsterChaseDirector.closeDogGap()). Game over callback (onMajorHazard on Hazard base, wired via FallingIceHazard). LevelManager creates hazards from JSON and wires dog gap penalty. 181 tests passing (22 suites).
-- **Phase 9:** SaveService (localStorage persistence with load/save/reset/migration), LevelSaveData/SaveData interfaces, GameApp wired to save on level complete/part collect/upgrade acquire. LevelSelectScreen (DOM-based 15-level grid, unlock sequencing, stats display, reset save with confirmation). 195 tests passing (23 suites).
-- **Phase 10:** All 15 levels built as JSON in `public/assets/levels/`. Each level has meta description, atmosphere settings, player spawn, terrain pieces, obstacles (jump_over/slide_under/crumbling), dog route waypoints, dog tuning (increasing difficulty from patrolSpeed 3→6, chaseSpeed 7→13), helicopter part spawn, safe zone, powerups, and hazards (cracked_ice/falling_ice/sliding_ice/avalanche). Difficulty curve progresses from simple tutorial (Crash Site) through mazes and blizzards to the finale (Helicopter Landing). 195 tests passing (23 suites).
+*(Previous phases unchanged — see git log)*
+
+- **Phase 11 slice 1:** CameraShake tests (8 tests). SnowParticleSystem null-safety fix.
+- **Phase 11 slice 2:** AudioManager with mock mode + Web Audio API (17 tests). Volume, mute, play/stop, file loading, dispose lifecycle.
+- **Phase 11 slice 3:** VictorySequence (14 tests). Staged end-game sequence: FadeIn→Reveal→Cure→Escape→Victory→Done. Timed progression with callbacks, skipTo, reset.
+- **Phase 11 slice 4:** MonsterAnimationController (17 tests). Dog animation state machine: Patrol/Chase/Catch with smooth scale interpolation, configurable animation names, close warning.
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 11: Audio, animation, polish — placeholder animations for Jim and dog, sound effects (pickup, dog, hazards, footsteps), chase music layers, snow particle system, camera shake on hazards, victory sequence.
+- Phase 11 slice 5: SnowParticleSystem tests — or continue with Jim placeholder animations system.
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -53,8 +48,10 @@ _(none yet)_
 - Hud.ts creates DOM elements — may need jsdom environment for unit tests.
 - When adding entities that create physics bodies, remove them in `dispose()` to prevent test pollution.
 - The HelicopterPartPickup creates its own mesh+body via Pickup. LevelLoader also spawns a raw part mesh+body — this creates duplicates. Next refactor: remove raw part/safezone spawning from LevelLoader and rely on entities only.
-- PowerupPickup.onActivate fires after the base Pickup.onCollect. The PowerupPickup sets `this.onCollect` in its constructor. If subclasses override `onCollect`, they must chain super's behavior.
-- PlayerUpgradeService stores upgrades in-memory for now; will integrate with SaveService (Phase 9).
-- UpgradePickup uses an OctahedronGeometry (different from Pickup's box and PowerupPickup's box) to visually distinguish permanent upgrades from temporary powerups.
+- AudioManager.mock mode auto-detects missing AudioContext — play() needs init() first.
+- SnowParticleSystem uses THREE.js + canvas — tests need jsdom or partial rendering mock.
+- CameraShake.getOffset() returns one final non-zero vector on the frame intensity decays to zero, then returns silence.
+- VictorySequence is pure logic, no DOM — testable in Node without jsdom.
+- MonsterAnimationController is pure logic, no DOM — testable in Node without jsdom.
 
-**Last Updated:** 2026-07-01 — Phase 10 complete. All 15 levels built. (195 tests)
+**Last Updated:** 2026-07-01 — Phase 11 at 4/10 slices (251 tests)

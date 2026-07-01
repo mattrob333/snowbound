@@ -103,13 +103,14 @@
 - [x] Level 15 — Helicopter Landing (main ignition, final chase+cure)
 
 ## Phase 11: Audio, animation, polish
+- [x] Camera shake — CameraShake.ts with trigger/decay/clear, 8 tests
+- [x] Audio system — AudioManager with mock mode + Web Audio API, 17 tests
+- [x] Victory sequence — VictorySequence with 6-stage progression, 14 tests
+- [x] Dog animation controller — MonsterAnimationController state machine, 17 tests
 - [ ] Jim placeholder animations
-- [ ] Dog placeholder animations
-- [ ] Pickup sounds
+- [ ] Dog placeholder animations (wired from MonsterAnimationController)
+- [ ] Pickup sounds (AudioManager ready, needs wiring into game loop)
 - [ ] Dog positional audio
 - [ ] Chase music layers
 - [ ] Jim voice lines
 - [ ] Dog slip comedy event
-- [ ] Snow particle system
-- [ ] Camera shake
-- [ ] Victory sequence
