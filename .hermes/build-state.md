@@ -33,7 +33,7 @@
 - **Phase 11 slice 5:** JimAnimationController (12 tests). Player animation state machine mapping PlayerMovementState → JimAnimState with crossfade progress, blend weight, previous/current animation names, configurable transition duration and animation name overrides.
 - **Phase 11 slice 6:** Dog animation wiring (10 integration tests). MonsterAnimationController now wired into MonsterDog via state setter. MonsterChaseDirector calls updateAnimation() each frame and propagates closeWarning to animation controller. Dog mesh scale now driven by animation state. 273 tests total.
 - **Phase 11 slice 8:** Dog positional audio (7 new tests — 282 total). AudioManager now has SpatialSoundHandle + playSpatial() with PannerNode for 3D positional audio. MonsterDog starts a looping 'dog_growl' spatial sound when provided with AudioManager; sound position syncs on every movement. MonsterChaseDirector and LevelManager wire AudioManager through to the dog. All quality gates green, 282 tests passing. commit 285e66b.
-- **Phase 11 slice 9:** Chase music layers — MusicLayerManager with patrol/chase crossfade based on dog proximity/gap. Two looping music tracks (patrol ambient + chase intensity) crossfade with configurable fade speed. Automatically starts/stops tracks based on effective volume. Integrated into MonsterChaseDirector via update() and LevelManager. 14 new tests, 296 tests total. commit <CURRENT>.
+- **Phase 11 slice 9:** Chase music layers — MusicLayerManager with patrol/chase crossfade based on dog proximity/gap. Two looping music tracks (patrol ambient + chase intensity) crossfade with configurable fade speed. Automatically starts/stops tracks based on effective volume. Integrated into MonsterChaseDirector via update() and LevelManager. 14 new tests, 296 tests total. commit bb5d36b.
 
 ## Open Issues / Blockers
 _(none yet)_
@@ -58,4 +58,4 @@ _(none yet)_
 - VictorySequence is pure logic, no DOM — testable in Node without jsdom.
 - MonsterAnimationController is pure logic, no DOM — testable in Node without jsdom.
 
-**Last Updated:** 2026-07-01 — Phase 11 at 8/10 slices (282 tests)
+**Last Updated:** 2026-06-30 — Phase 11 at 9/10 slices (296 tests)
