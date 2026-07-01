@@ -12,7 +12,10 @@ The INNER loop reads this FIRST every tick and resolves OPEN corrections as top 
 
 ## Open Corrections
 
-_(none — inner loop in alignment as of last audit)_
+### HIGH — Builder crashed mid-tick: stale lock + uncommitted doc sync — OPEN (audit 2026-07-01T01:10 UTC)
+**Problem:** Builder tick at 21:07 UTC failed (RuntimeError). Lock from previous tick (20:53) was left behind — 16+ min stale at supervisor audit. Builder's code changes (MonsterAnimationController at 24e46c5) were committed, but build-state.md and TASKS.md had uncommitted doc-only changes showing Phase 11 slice 4 as complete. Supervisor removed stale lock and committed doc sync at 95ea1c1.
+**Required fix:** Ensure builder cleans up lock file after each tick (even on failure). Lock cleanup/retry logic needed in builder's error handler.
+**Acceptance:** No more stale locks surviving across builder ticks.
 
 ## Resolved Corrections
 
