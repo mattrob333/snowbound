@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { ThreeRenderer } from '../engine/rendering/ThreeRenderer';
+import { EnvironmentSystem } from '../engine/rendering/EnvironmentSystem';
+import { CameraShake } from '../engine/camera/CameraShake';
 import { PhysicsWorld } from '../engine/physics/PhysicsWorld';
 import { AssetManager } from '../engine/assets/AssetManager';
 import { AudioManager } from '../engine/audio/AudioManager';
@@ -17,7 +19,12 @@ import { Hud } from '../gameplay/ui/Hud';
 import { LevelSelectScreen } from '../gameplay/ui/LevelSelectScreen';
 import { GameOverScreen } from '../gameplay/ui/GameOverScreen';
 import { TitleScreen } from '../gameplay/ui/TitleScreen';
-import { CAMERA_DISTANCE } from '../config/constants';
+import {
+  CAMERA_DISTANCE,
+  CAMERA_EXPLORATION_FOV,
+  CAMERA_CHASE_FOV,
+  CAMERA_NEAR_DOG_FOV,
+} from '../config/constants';
 import type { GameContext } from './GameContext';
 
 export class GameApp {
@@ -30,6 +37,8 @@ export class GameApp {
   private titleScreen: TitleScreen | null = null;
   private saveService: SaveService;
   private playerUpgradeService: PlayerUpgradeService;
+  private environment: EnvironmentSystem | null = null;
+  private cameraShake = new CameraShake();
 
   constructor() {
     this.saveService = new SaveService();
@@ -70,6 +79,8 @@ export class GameApp {
     this.titleScreen = new TitleScreen();
     this.titleScreen.attach(container);
     this.titleScreen.onPlay = () => {
+      // First user gesture — browsers allow audio to start from here
+      void this.ctx?.audio.context?.resume();
       this.titleScreen?.hide();
       this.showLevelSelect();
     };
@@ -79,48 +90,33 @@ export class GameApp {
     const input = new InputManager();
     input.attach(window);
 
-    // Scene setup
-    const groundGeo = new THREE.PlaneGeometry(200, 200);
-    const groundMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff, roughness: 0.8, metalness: 0.0,
-    });
-    const ground = new THREE.Mesh(groundGeo, groundMat);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -0.5;
-    ground.receiveShadow = true;
-
-    const hemiLight = new THREE.HemisphereLight(0x87ceeb, 0xffffff, 0.8);
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    dirLight.position.set(10, 20, 10);
-    dirLight.castShadow = true;
-
-    const grid = new THREE.GridHelper(100, 20, 0x444444, 0x666666);
-
-    renderer.scene.add(ground);
-    renderer.scene.add(hemiLight);
-    renderer.scene.add(dirLight);
-    renderer.scene.fog = new THREE.Fog(0xbbc4d0, 30, 120);
-    renderer.scene.add(grid);
+    // Scene setup — sky, lighting, snow ground, falling snow
+    this.environment = new EnvironmentSystem(renderer.scene);
+    renderer.environment = this.environment;
 
     // Physics
     const physics = new PhysicsWorld();
     await physics.init();
     physics.addStaticGroundCollider(200, -0.5);
 
-    // Camera rig
+    // Camera rig — behind the player, facing down-route (+z)
     const cameraRig = new ThirdPersonCameraRig(renderer.camera);
-    cameraRig.setAzimuth(0);
+    cameraRig.setAzimuth(-Math.PI / 2);
     cameraRig.setDistance(CAMERA_DISTANCE);
 
     // Player
     const player = new Player(physics, cameraRig);
-    player.mesh.position.set(0, 4, 0);
-    renderer.scene.add(player.mesh);
+    player.root.position.set(0, 4, 0);
+    renderer.scene.add(player.root);
+    player.visual.loadModel();
 
     // Systems
     const entityManager = new EntityManager();
     const assets = new AssetManager();
     const audio = new AudioManager();
+    // Without init() every audio call throws, which used to abort level
+    // loading before the dog/hazards were spawned.
+    audio.init();
     const levelManager = new LevelManager(physics, renderer, audio);
 
     this.ctx = {
@@ -147,8 +143,41 @@ export class GameApp {
     };
 
     this.stateMachine.setState('Boot' as never);
+    // Expose for debugging in dev builds (harmless in production bundles)
+    (window as unknown as Record<string, unknown>).__snowbound = this.ctx;
     console.log('[Snowbound] Ready.');
-    this.loop.start(this.ctx, () => this.hud.update(this.ctx.clock.delta, this.ctx));
+    this.loop.start(this.ctx, (ctx) => this.onFrame(ctx));
+  }
+
+  /** Per-render-frame updates: environment, camera effects, HUD */
+  private onFrame(ctx: GameContext): void {
+    const dt = ctx.clock.frameDelta ?? ctx.clock.delta;
+    const camera = ctx.renderer.camera;
+    const playerPos = ctx.player.root.position;
+
+    this.environment?.update(dt, camera.position, playerPos);
+
+    // FOV kick: widen during the chase, more when the dog is right behind
+    const director = ctx.levelManager.chaseDirector;
+    const chasing = director?.chaseActive === true && !director.caught && !director.complete;
+    let targetFov = CAMERA_EXPLORATION_FOV;
+    if (chasing) {
+      targetFov = director!.closeWarning ? CAMERA_NEAR_DOG_FOV : CAMERA_CHASE_FOV;
+    }
+    if (Math.abs(camera.fov - targetFov) > 0.05) {
+      camera.fov += (targetFov - camera.fov) * (1 - Math.exp(-4 * dt));
+      camera.updateProjectionMatrix();
+    }
+
+    // Rumble while the dog is breathing down Jim's neck
+    if (chasing && director!.closeWarning) {
+      this.cameraShake.trigger(0.12);
+    }
+    if (this.cameraShake.isShaking) {
+      camera.position.add(this.cameraShake.getOffset(dt));
+    }
+
+    this.hud.update(ctx.clock.delta, ctx);
   }
 
   /**
@@ -171,12 +200,15 @@ export class GameApp {
     const spawn = ctx.levelManager.runtime?.playerSpawn;
     if (spawn) {
       ctx.player.kcc.setPosition(spawn);
-      ctx.player.mesh.position.set(spawn.x, spawn.y - 0.9, spawn.z);
-      ctx.player.getCameraRig().teleport(new THREE.Vector3(spawn.x, spawn.y + 1.4, spawn.z));
+      ctx.player.root.position.set(spawn.x, spawn.y - 0.9, spawn.z);
+      const rig = ctx.player.getCameraRig();
+      rig.setAzimuth(-Math.PI / 2); // face down-route after restarts too
+      rig.teleport(new THREE.Vector3(spawn.x, spawn.y + 1.4, spawn.z));
     }
 
     if (ctx.levelManager.chaseDirector) {
       ctx.levelManager.chaseDirector.onCatchPlayer = () => {
+        this.cameraShake.trigger(0.9);
         this.gameOverScreen?.show();
       };
     }

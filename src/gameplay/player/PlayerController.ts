@@ -29,6 +29,10 @@ export class PlayerController {
   private voiceLines: VoiceLineService | null = null;
   /** Tracks previous sprint state to detect transitions */
   private wasSprinting = false;
+  /** Coyote time remaining — jump grace period after leaving the ground */
+  private coyoteTimer = 0;
+  /** Jump buffer remaining — a press shortly before landing still jumps */
+  private jumpBufferTimer = 0;
 
   constructor(
     kcc: CharacterKCC,
@@ -94,6 +98,14 @@ export class PlayerController {
       : (hasMoveInput ? PLAYER_TUNING.runSpeed : 0);
     const isGrounded = this.kcc.isGrounded();
 
+    // Jump forgiveness timers
+    this.coyoteTimer = isGrounded
+      ? PLAYER_TUNING.coyoteTime
+      : Math.max(0, this.coyoteTimer - dt);
+    this.jumpBufferTimer = input.isKeyPressed(ControlAction.Jump)
+      ? PLAYER_TUNING.jumpBufferTime
+      : Math.max(0, this.jumpBufferTimer - dt);
+
     // --- Wall-run handling ---
     let wallJumpApplied = false;
     const wantsWallJump = input.isKeyPressed(ControlAction.Jump);
@@ -141,10 +153,14 @@ export class PlayerController {
     }
 
     // --- Jump ---
-    // Normal jump (not wall jump) when grounded
-    if (!wallJumpApplied && input.isKeyPressed(ControlAction.Jump) && isGrounded) {
+    // Normal jump (not wall jump) with coyote time + jump buffering:
+    // works within a grace window after leaving a ledge, and a press
+    // just before landing is remembered.
+    if (!wallJumpApplied && this.jumpBufferTimer > 0 && this.coyoteTimer > 0) {
       this.velocityY = PLAYER_TUNING.jumpVelocity;
       this._isJumping = true;
+      this.jumpBufferTimer = 0;
+      this.coyoteTimer = 0;
       this.voiceLines?.playJump();
     }
 
@@ -154,7 +170,11 @@ export class PlayerController {
       if (this.wallRunController && this.wallRunController.isWallRunning()) {
         this.velocityY += this.wallRunController.getWallRunGravity(PLAYER_TUNING.gravity, dt);
       } else {
-        this.velocityY += PLAYER_TUNING.gravity * dt;
+        // Variable jump height: releasing Jump while rising cuts the jump short
+        const rising = this.velocityY > 0;
+        const holdingJump = input.isKeyDown(ControlAction.Jump);
+        const gravityScale = rising && !holdingJump ? PLAYER_TUNING.lowJumpGravityMultiplier : 1;
+        this.velocityY += PLAYER_TUNING.gravity * gravityScale * dt;
       }
     }
 
@@ -196,5 +216,20 @@ export class PlayerController {
 
   isJumping(): boolean {
     return this._isJumping;
+  }
+
+  /** Current vertical velocity (m/s), negative while falling */
+  getVelocityY(): number {
+    return this.velocityY;
+  }
+
+  /** Normalised horizontal movement direction from the last update */
+  getMoveDirection(): THREE.Vector3 {
+    return this.moveDir;
+  }
+
+  /** Whether movement keys were held during the last update */
+  hasMoveInput(): boolean {
+    return this.moveDir.lengthSq() > 1e-6;
   }
 }

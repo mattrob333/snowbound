@@ -1,10 +1,13 @@
 import * as THREE from 'three';
 import { FOV, NEAR_PLANE, FAR_PLANE, BG_COLOR, MAX_PIXEL_RATIO } from '../../config/constants';
+import type { EnvironmentSystem } from './EnvironmentSystem';
 
 export class ThreeRenderer {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene: THREE.Scene;
   readonly camera: THREE.PerspectiveCamera;
+  /** Set by GameApp — lets level loading apply per-level atmosphere */
+  environment: EnvironmentSystem | null = null;
 
   constructor() {
     this.renderer = new THREE.WebGLRenderer({
@@ -14,6 +17,10 @@ export class ThreeRenderer {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO));
     this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.25;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(BG_COLOR);

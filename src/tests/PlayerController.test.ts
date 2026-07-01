@@ -134,6 +134,46 @@ describe('PlayerController', () => {
     const peakPos = kcc.getPosition().y;
     expect(peakPos).toBeGreaterThan(groundPos + 0.1);
   });
+
+  it('should buffer a jump pressed just before landing', () => {
+    const { kcc, input, controller } = createController();
+    // Away from the origin so leftover character bodies from other tests can't interfere
+    kcc.setPosition({ x: 50, y: 3, z: 50 });
+    physics.step(1 / 60);
+
+    for (let i = 0; i < 180; i++) {
+      controller.update(1 / 60, input, 0);
+      physics.step(1 / 60);
+    }
+    const groundY = kcc.getPosition().y;
+
+    // Drop from above and press Jump while still falling, near the ground
+    kcc.teleport({ x: 50, y: groundY + 1.5, z: 50 });
+    physics.step(1 / 60);
+
+    let pressed = false;
+    let landed = false;
+    let maxYAfterLanding = -Infinity;
+    for (let i = 0; i < 120; i++) {
+      const y = kcc.getPosition().y;
+      // Press above the KCC's 0.3 snap-to-ground zone, ~0.08s before touchdown
+      if (!pressed && !kcc.isGrounded() && y - groundY < 0.55) {
+        input.setAction(ControlAction.Jump, true);
+        pressed = true;
+      }
+      controller.update(1 / 60, input, 0);
+      input.update();
+      input.setAction(ControlAction.Jump, false);
+      physics.step(1 / 60);
+
+      if (kcc.isGrounded()) landed = true;
+      if (landed) maxYAfterLanding = Math.max(maxYAfterLanding, kcc.getPosition().y);
+    }
+
+    expect(pressed).toBe(true);
+    // The buffered press should fire a jump on landing
+    expect(maxYAfterLanding).toBeGreaterThan(groundY + 0.25);
+  });
 });
 
 describe('PlayerController — Slide and Wall-run integration', () => {

@@ -61,7 +61,9 @@ export class CharacterKCC {
   }
 
   setPosition(pos: { x: number; y: number; z: number }): void {
-    this.characterBody.setNextKinematicTranslation(pos);
+    // Immediate teleport. setNextKinematicTranslation would be overwritten by
+    // the controller's applyMovement() before the next physics step applies it.
+    this.characterBody.setTranslation(pos, true);
   }
 
   getPosition(): { x: number; y: number; z: number } {

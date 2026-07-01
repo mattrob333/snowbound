@@ -38,7 +38,8 @@ export class GameLoop {
       steps++;
     }
 
-    // Run per-frame callback (HUD update, etc.) before rendering
+    // Run per-frame callback (HUD, visuals, camera effects) before rendering
+    ctx.clock.frameDelta = frameDt;
     this.onFrameCallback?.(ctx);
 
     ctx.renderer.render();

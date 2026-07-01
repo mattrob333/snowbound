@@ -143,7 +143,9 @@ export class LevelLoader {
   applyAtmosphere(data: LevelData): void {
     if (!this.renderer) return;
     const a = data.atmosphere;
-    if (a?.fogColor !== undefined) {
+    if (this.renderer.environment) {
+      this.renderer.environment.applyAtmosphere(a);
+    } else if (a?.fogColor !== undefined) {
       this.renderer.scene.fog = new THREE.Fog(a.fogColor, 30, 100);
     }
   }
@@ -288,6 +290,13 @@ export class LevelLoader {
         group = new THREE.Group();
     }
 
+    group.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+
     const scale = dec.scale ?? 1;
     group.scale.set(scale, scale, scale);
     group.position.set(dec.position.x, dec.position.y, dec.position.z);
@@ -304,8 +313,8 @@ export class LevelLoader {
 
   // ---- Private spawn helpers ----
 
-  private createTerrainMaterial(color: number): THREE.MeshLambertMaterial {
-    return new THREE.MeshLambertMaterial({ color });
+  private createTerrainMaterial(color: number): THREE.MeshStandardMaterial {
+    return new THREE.MeshStandardMaterial({ color, roughness: 0.9, metalness: 0 });
   }
 
   private spawnTerrainPiece(piece: TerrainPiece): { mesh: THREE.Mesh; body: RAPIER.RigidBody } {
@@ -317,6 +326,8 @@ export class LevelLoader {
     const geometry = new THREE.BoxGeometry(w, h, d);
     const material = this.createTerrainMaterial(color);
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     mesh.position.set(piece.position.x, piece.position.y, piece.position.z);
     mesh.rotation.y = piece.rotationY ?? 0;
 
@@ -344,6 +355,8 @@ export class LevelLoader {
     const geometry = new THREE.BoxGeometry(w, h, d);
     const material = this.createTerrainMaterial(color);
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     mesh.position.set(obs.position.x, obs.position.y, obs.position.z);
     mesh.rotation.y = obs.rotationY ?? 0;
 
@@ -371,8 +384,16 @@ export class LevelLoader {
     const color = haz.color ?? 0x88aaff;
 
     const geometry = new THREE.BoxGeometry(w, h, d);
-    const material = this.createTerrainMaterial(color);
+    // Hazards read as slick translucent ice
+    const material = new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.15,
+      metalness: 0.1,
+      transparent: true,
+      opacity: 0.85,
+    });
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.receiveShadow = true;
     mesh.position.set(haz.position.x, haz.position.y, haz.position.z);
 
     if (this.renderer) {

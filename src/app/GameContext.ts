@@ -13,6 +13,8 @@ import type { PlayerUpgradeService } from '../gameplay/player/PlayerUpgradeServi
 export interface GameClock {
   elapsed: number;
   delta: number;
+  /** Render-frame delta (variable, unlike the fixed physics delta) */
+  frameDelta?: number;
 }
 
 export interface GameContext {

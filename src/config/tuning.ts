@@ -14,6 +14,12 @@ export const PLAYER_TUNING = {
   wallRunGravityScale: 0.25,
   wallRunMinSpeed: 6.0,
   stumbleDuration: 0.65,
+  /** Grace period after walking off a ledge where jump still works */
+  coyoteTime: 0.12,
+  /** How early a jump press is remembered before landing */
+  jumpBufferTime: 0.15,
+  /** Extra gravity while rising with jump released — tap = short hop, hold = full jump */
+  lowJumpGravityMultiplier: 1.7,
 } as const;
 
 export const DOG_TUNING = {

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { GameContext } from '../../app/GameContext';
 import type { IGameEntity } from '../entities/EntityManager';
 import { RoutePath } from '../levels/RoutePath';
-import { DOG_HEIGHT, DOG_WIDTH } from '../../config/constants';
+import { DogVisual } from './DogVisual';
 import type { DogTuning, AABB } from '../levels/LevelData';
 import type { AudioManager, SpatialSoundHandle } from '../../engine/audio/AudioManager';
 import {
@@ -37,7 +37,9 @@ const DEFAULT_SLIP_DURATION = 0.5;
  * During chase, it aims to reach the player's position.
  */
 export class MonsterDog implements IGameEntity {
-  readonly mesh: THREE.Mesh;
+  /** Root visual group (origin at the dog's feet) */
+  readonly mesh: THREE.Group;
+  readonly visual: DogVisual;
   readonly routePath: RoutePath;
   readonly animation: MonsterAnimationController;
   tuning: DogTuning;
@@ -58,7 +60,6 @@ export class MonsterDog implements IGameEntity {
   private _slipCooldown: number = 0;
   /** Previous state before slip triggered (to restore after slip ends) */
   private _previousState: DogState = 'patrol';
-  private eyeMeshes: THREE.Mesh[] = [];
 
   constructor(
     routePath: RoutePath,
@@ -72,20 +73,9 @@ export class MonsterDog implements IGameEntity {
     this.iceZones = iceZones ?? [];
     this.animation = new MonsterAnimationController();
 
-    // Create the visual mesh — a tall brown capsule placeholder
-    const capsuleGeo = new THREE.CapsuleGeometry(
-      DOG_WIDTH / 2,
-      DOG_HEIGHT - DOG_WIDTH,
-      6,
-      12,
-    );
-    const capsuleMat = new THREE.MeshStandardMaterial({
-      color: 0x8b4513,
-      roughness: 0.8,
-      metalness: 0.0,
-    });
-    this.mesh = new THREE.Mesh(capsuleGeo, capsuleMat);
-    this.mesh.castShadow = true;
+    // Visual body — capsule placeholder that upgrades to the animated model
+    this.visual = new DogVisual();
+    this.mesh = this.visual.root;
 
     // Start at the first waypoint
     const startPos = routePath.getPositionAtProgress(0);
@@ -94,20 +84,8 @@ export class MonsterDog implements IGameEntity {
     if (renderer) {
       renderer.scene.add(this.mesh);
       this.renderer = renderer;
-    }
-
-    // Add glowing red eyes at the top of the capsule
-    const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
-    const eyeMat = new THREE.MeshStandardMaterial({
-      color: 0xff0000,
-      emissive: 0xff0000,
-      emissiveIntensity: 2.0,
-    });
-    for (const side of [-1, 1]) {
-      const eye = new THREE.Mesh(eyeGeo, eyeMat);
-      eye.position.set(side * 0.3, DOG_HEIGHT / 2 - 0.2, 0.6);
-      this.mesh.add(eye);
-      this.eyeMeshes.push(eye);
+      // Only load the model when actually rendering (keeps tests Node-safe)
+      this.visual.loadModel();
     }
 
     // Start spatial audio for the dog's growl if audio manager available
@@ -125,7 +103,9 @@ export class MonsterDog implements IGameEntity {
   set state(value: DogState) {
     if (value !== this._state) {
       this._state = value;
-      this.animation.transitionTo(dogStateToAnim(value));
+      const animState = dogStateToAnim(value);
+      this.animation.transitionTo(animState);
+      this.visual.setState(animState);
     }
   }
 
@@ -171,6 +151,9 @@ export class MonsterDog implements IGameEntity {
     // Apply current scale from animation state
     const scale = this.animation.currentScale;
     this.mesh.scale.set(scale, scale, scale);
+
+    // Advance skeletal animation and glow effects
+    this.visual.update(dt);
   }
 
   /**
@@ -188,6 +171,7 @@ export class MonsterDog implements IGameEntity {
    */
   setCloseWarning(active: boolean): void {
     this.animation.setCloseWarning(active);
+    this.visual.setCloseWarning(active);
   }
 
   /** Check if the dog's current position is on any ice zone */
@@ -303,25 +287,9 @@ export class MonsterDog implements IGameEntity {
       this.audioHandle.stop();
       this.audioHandle = null;
     }
-    // Remove eye meshes
-    for (const eye of this.eyeMeshes) {
-      this.mesh.remove(eye);
-      eye.geometry.dispose();
-      if (Array.isArray(eye.material)) {
-        for (const m of eye.material) m.dispose();
-      } else if (eye.material) {
-        eye.material.dispose();
-      }
-    }
-    this.eyeMeshes = [];
     if (this.renderer) {
       this.renderer.scene.remove(this.mesh);
     }
-    this.mesh.geometry.dispose();
-    if (Array.isArray(this.mesh.material)) {
-      for (const m of this.mesh.material) m.dispose();
-    } else if (this.mesh.material) {
-      this.mesh.material.dispose();
-    }
+    this.visual.dispose();
   }
 }

@@ -33,8 +33,10 @@ export class ThirdPersonCameraRig {
     this._applyPosition();
   }
 
-  update(_dt: number, target: THREE.Vector3): void {
-    this._target.lerp(target, this._smoothSpeed * 0.016);
+  update(dt: number, target: THREE.Vector3): void {
+    // Frame-rate independent exponential smoothing
+    const blend = 1 - Math.exp(-this._smoothSpeed * Math.max(dt, 0));
+    this._target.lerp(target, blend);
     this._applyPosition();
     this.camera.lookAt(this._target);
   }
