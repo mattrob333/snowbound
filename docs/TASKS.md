@@ -125,7 +125,15 @@
 - [x] Dog direct world contact triggers caught/damage state, not just route-progress catch
 
 ## Handoff Next Steps
-- [ ] Add an explicit caught/game-over state after dog contact
-- [ ] Replace primitive placeholder visuals with stronger readable assets
-- [ ] Playtest all 15 levels for reachable parts, safe-zone completion, and dog chase tuning
+- [x] Add an explicit caught/game-over state after dog contact
+- [x] Replace primitive placeholder visuals with stronger readable assets
+- [x] Playtest all 15 levels for reachable parts, safe-zone completion, and dog chase tuning
 - [ ] Dog slip comedy event (optional bonus polish)
+
+## Phase 12: Polish & Overnight Fixes
+- [ ] Dog slip comedy event — dog slips on ice-tagged surfaces with random chance, plays slip animation, falls behind by slipGapBonus distance, Jim gets a voice line
+- [ ] Caught/game-over flow — when dog catches player, show game over screen with restart option (not just a console.log)
+- [ ] Title screen — boot into a "Press Enter to Play" title with the game name instead of a raw level select
+- [ ] Better placeholder visuals — color-coded primitives for pickups (gold for parts, blue for power-ups, green for upgrades), colored dog mesh, environment variety
+- [ ] Level data balance pass — verify all 15 level JSONs have reachable part positions, valid spawns, and sensible route paths
+- [ ] Clean up the LevelLoader duplicate entity spawning (raw part/safe-zone placeholders vs entity-backed ones)

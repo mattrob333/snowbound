@@ -3,7 +3,7 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** ⏸️ STOPPED — All Phase 11 slices complete. 330 tests green. Quality gate passed.
+**Status:** ⏸️ PAUSED — Phase 11 complete. Ready for Phase 12 (Polish & Overnight Fixes). 333 tests green. Quality gate passed.
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 3m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
@@ -21,7 +21,8 @@
 9. [x] Phase 8 — Hazard system
 10. [x] Phase 9 — Save and progression
 11. [x] Phase 10 — Build all 15 levels
-12. [x] Phase 11 — Audio, animation, polish (10/10 tasks done — 330 tests)
+12. [x] Phase 11 — Audio, animation, polish (10/10 tasks done — 333 tests)
+13. [ ] Phase 12 — Polish & Overnight Fixes
 
 ## Completed Tasks
 *(Previous phases unchanged — see git log)*
@@ -33,20 +34,12 @@
 - **Phase 11 slice 5:** JimAnimationController (12 tests). Player animation state machine mapping PlayerMovementState → JimAnimState with crossfade progress, blend weight, previous/current animation names, configurable transition duration and animation name overrides.
 - **Phase 11 slice 6:** Dog animation wiring (10 integration tests). MonsterAnimationController now wired into MonsterDog via state setter. MonsterChaseDirector calls updateAnimation() each frame and propagates closeWarning to animation controller. Dog mesh scale now driven by animation state. 273 tests total.
 - **Phase 11 slice 8:** Dog positional audio (7 new tests — 282 total). AudioManager now has SpatialSoundHandle + playSpatial() with PannerNode for 3D positional audio. MonsterDog starts a looping 'dog_growl' spatial sound when provided with AudioManager; sound position syncs on every movement. MonsterChaseDirector and LevelManager wire AudioManager through to the dog. All quality gates green, 282 tests passing. commit 285e66b.
-- **Phase 11 slice 9:** Chase music layers — MusicLayerManager with patrol/chase crossfade based on dog proximity/gap. Two looping music tracks (patrol ambient + chase intensity) crossfade with configurable fade speed. Automatically starts/stops tracks based on effective volume. Integrated into MonsterChaseDirector via update() and LevelManager. 14 new tests, 296 tests total. commit bb5d36b.
-- **Phase 11 slice 10:** Jim voice lines — VoiceLineService (34 tests) with per-event cooldowns (jump 1s, slide 2s, wall-run 2s, stumble 3s, sprint 0.5s, rest unbounded). Wired into: HelicopterPartPickup.onCollect → voice_part_collected, MonsterChaseDirector.onCatchPlayer → voice_caught, PlayerController (jump/slide/wall-run/sprint transitions) → respective voice lines, hazard onActivate → voice_stumble, SafeZone.onLevelComplete → voice_level_complete. 330 tests total. commit CURRENT.
 
 ## Open Issues / Blockers
-- Dog slip comedy event (low priority — not part of original 10-slice plan)
-- 2026-06-30 local QA pass: pulled through Phase 10 plus Phase 11 slices 1-5 from `origin/main`, then corrected screen-relative A/D movement and cleaned visible HUD/level-select mojibake. Re-run full quality gate before pushing.
-- 2026-06-30 gameplay QA pass: added in-game controls/goal legend, dog-caught damage feedback, level-start entity cleanup, level spawn positioning, and removed duplicate raw part/safe-zone placeholders from the entity-backed app path.
-- 2026-06-30 live-control QA pass: fixed Space jump edge handling in the game loop, widened pickup collection tolerance for elevated helicopter parts, and added direct dog-world-contact catch detection so visible contact triggers damage/caught feedback.
-- No current blocking compile/test issue. Remaining lint output is test-only `no-explicit-any` warnings.
+_(none — all previous issues resolved or baked into Phase 12 tasks below)_
 
 ## Next Action
-- All Phase 11 slices are complete. Check BUILD_STOP_CONDITIONS: 330+ tests passing, quality gate green, all planned work complete.
-- Recommended handoff work: add an explicit caught/game-over flow after dog contact, improve the placeholder visuals beyond primitives, and playtest all 15 levels for reachable parts, safe-zone completion, and dog chase tuning.
-- Optional bonus: dog slip comedy event.
+- Phase 12 — Overnight fixes: (1) Dog slip comedy event, (2) Caught/game-over flow after dog contact, (3) Better placeholder visuals, (4) Level data balance review, (5) Title screen for boot flow
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -66,4 +59,4 @@
 - VictorySequence is pure logic, no DOM — testable in Node without jsdom.
 - MonsterAnimationController is pure logic, no DOM — testable in Node without jsdom.
 
-**Last Updated:** 2026-07-01 — Phase 11 at 10/10 slices complete (330 tests)
+**Last Updated:** 2026-07-01 — Resuming for Phase 12 (Polish & Overnight Fixes)
