@@ -59,5 +59,14 @@
   ],
   "hazards": [
     { "type": "cracked_ice", "position": { "x": 4, "y": 0.25, "z": 1 }, "halfExtents": { "x": 1.5, "y": 0.1, "z": 1.5 }, "color": 8966399 }
+  ],
+  "decorations": [
+    { "position": { "x": -9, "y": 0, "z": 5 }, "type": "snow_rock" },
+    { "position": { "x": 9, "y": 0, "z": 5 }, "type": "snow_rock" },
+    { "position": { "x": -11, "y": 0, "z": 12 }, "type": "pine_tree", "scale": 1.2 },
+    { "position": { "x": 11, "y": 0, "z": 12 }, "type": "pine_tree", "scale": 1.0 },
+    { "position": { "x": -8, "y": 0.5, "z": 22 }, "type": "pine_tree", "scale": 0.8, "rotationY": 0.5 },
+    { "position": { "x": 6, "y": 0.5, "z": 24 }, "type": "ice_crystal" },
+    { "position": { "x": -6, "y": 0.5, "z": 26 }, "type": "snowman" }
   ]
 }

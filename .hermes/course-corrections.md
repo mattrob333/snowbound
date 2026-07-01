@@ -11,20 +11,13 @@ The INNER loop reads this FIRST every tick and resolves OPEN corrections as top 
 ---
 
 ## Open Corrections
-
-### HIGH — Builder crashed mid-tick: stale lock + broken quality gate — FIXED (commit dcbc8c7, 8c1f4e4)
-**Problem:** Builder lock created at 2026-07-01 03:17:21 UTC was stale (>15 min at supervisor audit at 03:32 UTC). Builder was mid-refactor on Phase 12 tasks: removing raw part/safe-zone placeholders from LevelLoader (duplicate entity cleanup) and adding red eyes to MonsterDog (placeholder visuals). However:
-- LevelLoader.test.ts still referenced removed `partMesh`/`partBody`/`safeZoneMesh`/`safeZoneBody` — 4 typecheck errors + 1 failing test
-- LevelManager.ts had unused `THREE` import and `disposeRuntimeMesh` method — 3 typecheck errors
-- LevelLoader.ts had unused `HelicopterPartSpawn`/`SafeZoneData` imports — 2 typecheck errors
-- TASKS.md had TitleScreen task still marked [ ] despite commit 6cd00ba
-- 1 test failing (body count assertion still expecting raw part/safe-zone bodies)
-
-**Fix applied:** Supervisor removed stale lock, completed the refactor by removing stale test code/test body count/calling code/unused imports, removed unused `THREE` import and `disposeRuntimeMesh` from LevelManager, and updated TASKS.md. Quality gate: typecheck ✅, lint 0 errors ✅, 339 tests ✅, build ✅. Committed as dcbc8c7 + 8c1f4e4.
-
-**Root cause:** Builder may have exceeded per-tick timeout. The builder tick lifecycle should ensure lock cleanup on error/timeout (e.g., trap-based cleanup).
+_(none — inner loop in alignment as of last audit)_
 
 ## Resolved Corrections
+
+### HIGH — Builder crashed mid-tick: stale lock + broken quality gate — RESOLVED (commit dcbc8c7, 8c1f4e4 — supervisor fix)
+**Problem:** Builder lock created at 2026-07-01 03:17:21 UTC was stale (>15 min at supervisor audit at 03:32 UTC). Builder was mid-refactor on Phase 12 tasks: removing raw part/safe-zone placeholders from LevelLoader (duplicate entity cleanup) and adding red eyes to MonsterDog (placeholder visuals). However, LevelLoader.test.ts, LevelManager.ts, and LevelLoader.ts had stale references, TASKS.md was out of sync.
+**Fix applied:** Supervisor removed stale lock, completed the refactor by removing stale test code/test body count/calling code/unused imports, removed unused `THREE` import and `disposeRuntimeMesh` from LevelManager, and updated TASKS.md. Quality gate: typecheck ✅, lint 0 errors ✅, 339 tests ✅, build ✅. Committed as dcbc8c7 + 8c1f4e4.
 
 ### HIGH — Builder crashed mid-tick: stale lock + uncommitted doc sync — RESOLVED (commit 3ae6e4b — verified by builder tick at 2026-07-01T21:13 UTC)
 **Problem:** Builder tick at 21:07 UTC failed (RuntimeError). Lock from previous tick (20:53) was left behind — 16+ min stale at supervisor audit. Builder's code changes (MonsterAnimationController at 24e46c5) were committed, but build-state.md and TASKS.md had uncommitted doc-only changes showing Phase 11 slice 4 as complete. Supervisor removed stale lock and committed doc sync at 95ea1c1.

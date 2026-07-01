@@ -116,6 +116,25 @@ export interface DogTuning {
   slipDuration?: number;
 }
 
+/** Decorative prop types */
+export const DecorationType = {
+  Snowman: 'snowman',
+  PineTree: 'pine_tree',
+  IceCrystal: 'ice_crystal',
+  SnowRock: 'snow_rock',
+} as const;
+export type DecorationType = (typeof DecorationType)[keyof typeof DecorationType];
+
+/** A decorative prop in the level (no gameplay effect, visual only) */
+export interface DecorationData {
+  position: Vec3;
+  type: DecorationType;
+  /** Uniform scale multiplier (default 1.0) */
+  scale?: number;
+  /** Optional rotation in radians around Y axis */
+  rotationY?: number;
+}
+
 /** Complete level definition — drives LevelLoader */
 export interface LevelData {
   meta: LevelMeta;
@@ -129,4 +148,5 @@ export interface LevelData {
   safeZone: SafeZoneData;
   powerups: PowerupSpawn[];
   hazards: HazardSpawn[];
+  decorations?: DecorationData[];
 }
