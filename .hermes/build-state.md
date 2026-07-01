@@ -21,7 +21,7 @@
 9. [x] Phase 8 — Hazard system
 10. [x] Phase 9 — Save and progression
 11. [x] Phase 10 — Build all 15 levels
-12. [ ] Phase 11 — Audio, animation, polish (4/10 tasks done — 251 tests)
+12. [ ] Phase 11 — Audio, animation, polish (5/10 tasks done — 263 tests)
 
 ## Completed Tasks
 *(Previous phases unchanged — see git log)*
@@ -30,12 +30,13 @@
 - **Phase 11 slice 2:** AudioManager with mock mode + Web Audio API (17 tests). Volume, mute, play/stop, file loading, dispose lifecycle.
 - **Phase 11 slice 3:** VictorySequence (14 tests). Staged end-game sequence: FadeIn→Reveal→Cure→Escape→Victory→Done. Timed progression with callbacks, skipTo, reset.
 - **Phase 11 slice 4:** MonsterAnimationController (17 tests). Dog animation state machine: Patrol/Chase/Catch with smooth scale interpolation, configurable animation names, close warning.
+- **Phase 11 slice 5:** JimAnimationController (12 tests). Player animation state machine mapping PlayerMovementState → JimAnimState with crossfade progress, blend weight, previous/current animation names, configurable transition duration and animation name overrides.
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 11 slice 5: SnowParticleSystem tests — or continue with Jim placeholder animations system.
+- Phase 11 slice 6: Dog placeholder animations (wired from MonsterAnimationController into MonsterDog) — or Pickup sounds wiring.
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -54,4 +55,4 @@ _(none yet)_
 - VictorySequence is pure logic, no DOM — testable in Node without jsdom.
 - MonsterAnimationController is pure logic, no DOM — testable in Node without jsdom.
 
-**Last Updated:** 2026-07-01 — Phase 11 at 4/10 slices (251 tests)
+**Last Updated:** 2026-07-01 — Phase 11 at 5/10 slices (263 tests)
