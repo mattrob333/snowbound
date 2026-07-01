@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "id": "level-11",
+    "name": "Abandoned Mine",
+    "description": "A dark abandoned mine with collapsing tunnels and mine cart obstacles. Find the rotor shaft deep underground.",
+    "order": 11
+  },
+  "atmosphere": {
+    "fogColor": 3552822,
+    "fogDensity": 0.02,
+    "ambientIntensity": 0.2,
+    "directionalIntensity": 0.3
+  },
+  "playerSpawn": { "x": 0, "y": 2, "z": -6 },
+  "terrain": [
+    { "position": { "x": 0, "y": -0.5, "z": 0 }, "halfExtents": { "x": 5, "y": 0.5, "z": 4 }, "rotationY": 0, "color": 10526880 },
+    { "position": { "x": 6, "y": 0, "z": 6 }, "halfExtents": { "x": 3, "y": 0.25, "z": 3 }, "rotationY": 0, "color": 10066329 },
+    { "position": { "x": -6, "y": 0, "z": 12 }, "halfExtents": { "x": 3, "y": 0.25, "z": 3 }, "rotationY": 0, "color": 10066329 },
+    { "position": { "x": 4, "y": 0, "z": 18 }, "halfExtents": { "x": 3, "y": 0.25, "z": 3 }, "rotationY": 0, "color": 10066329 },
+    { "position": { "x": -4, "y": 0.5, "z": 24 }, "halfExtents": { "x": 4, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 11184810 },
+    { "position": { "x": 0, "y": 1, "z": 30 }, "halfExtents": { "x": 3, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 11842740 },
+    { "position": { "x": 3, "y": 0, "z": 9 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 8947848 },
+    { "position": { "x": -3, "y": 0, "z": 15 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 8947848 }
+  ],
+  "obstacles": [
+    { "type": "jump_over", "position": { "x": 0, "y": 0.5, "z": 3 }, "halfExtents": { "x": 3, "y": 0.5, "z": 0.6 }, "color": 6836762 },
+    { "type": "slide_under", "position": { "x": 3, "y": 1.5, "z": 8 }, "halfExtents": { "x": 2.5, "y": 0.15, "z": 0.6 }, "color": 5000268 },
+    { "type": "jump_over", "position": { "x": -3, "y": 0.5, "z": 14 }, "halfExtents": { "x": 2.5, "y": 0.5, "z": 0.8 }, "color": 6836762 },
+    { "type": "slide_under", "position": { "x": 2, "y": 1.5, "z": 20 }, "halfExtents": { "x": 2, "y": 0.15, "z": 0.6 }, "color": 5000268 },
+    { "type": "jump_over", "position": { "x": -2, "y": 0.5, "z": 27 }, "halfExtents": { "x": 2.5, "y": 0.5, "z": 0.8 }, "color": 6836762 }
+  ],
+  "dogRoute": [
+    { "position": { "x": 0, "y": 0, "z": -22 } },
+    { "position": { "x": 0, "y": 0, "z": -8 } },
+    { "position": { "x": 0, "y": 0, "z": 0 } },
+    { "position": { "x": 6, "y": 0, "z": 6 } },
+    { "position": { "x": -6, "y": 0, "z": 12 } },
+    { "position": { "x": 4, "y": 0, "z": 18 } },
+    { "position": { "x": -4, "y": 0.5, "z": 24 } },
+    { "position": { "x": 0, "y": 1, "z": 32 } }
+  ],
+  "dogTuning": {
+    "patrolSpeed": 5.0,
+    "chaseSpeed": 11.0,
+    "catchRadius": 1.2,
+    "patrolDistance": 8.0
+  },
+  "helicopterPart": {
+    "position": { "x": 0, "y": 2, "z": 16 },
+    "partId": "rotor_shaft"
+  },
+  "safeZone": {
+    "position": { "x": 0, "y": 1.5, "z": 33 },
+    "radius": 3,
+    "requiresPart": true
+  },
+  "powerups": [
+    { "position": { "x": 3, "y": 1, "z": 9 }, "type": "shield", "duration": 10 },
+    { "position": { "x": -3, "y": 1, "z": 15 }, "type": "speed_boost", "duration": 6 }
+  ],
+  "hazards": [
+    { "type": "cracked_ice", "position": { "x": 3, "y": 0.25, "z": 2 }, "halfExtents": { "x": 1.5, "y": 0.08, "z": 1.5 }, "color": 8966399 },
+    { "type": "falling_ice", "position": { "x": 1, "y": 5, "z": 11 }, "halfExtents": { "x": 0.8, "y": 1.2, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 0.8, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": -2, "y": 5, "z": 22 }, "halfExtents": { "x": 0.8, "y": 1.2, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 1.0, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": 0, "y": 5, "z": 28 }, "halfExtents": { "x": 1, "y": 1.5, "z": 1 }, "triggerRadius": 2.5, "fallDelay": 1.2, "color": 13553358 }
+  ]
+}

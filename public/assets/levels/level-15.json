@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "id": "level-15",
+    "name": "Helicopter Landing",
+    "description": "The final showdown. Sprint to the helicopter with the cure canister. The dog is relentless — this is your last chance to escape the snowbound nightmare.",
+    "order": 15
+  },
+  "atmosphere": {
+    "fogColor": 12298448,
+    "fogDensity": 0.008,
+    "ambientIntensity": 0.45,
+    "directionalIntensity": 0.6
+  },
+  "playerSpawn": { "x": 0, "y": 2, "z": -10 },
+  "terrain": [
+    { "position": { "x": 0, "y": -0.5, "z": 0 }, "halfExtents": { "x": 8, "y": 0.5, "z": 6 }, "rotationY": 0, "color": 14277081 },
+    { "position": { "x": 8, "y": 0, "z": 8 }, "halfExtents": { "x": 4, "y": 0.25, "z": 3 }, "rotationY": 0, "color": 13684944 },
+    { "position": { "x": -8, "y": 0, "z": 14 }, "halfExtents": { "x": 4, "y": 0.25, "z": 3 }, "rotationY": 0, "color": 13684944 },
+    { "position": { "x": 10, "y": 0, "z": 20 }, "halfExtents": { "x": 4, "y": 0.25, "z": 3 }, "rotationY": 0.2, "color": 13684944 },
+    { "position": { "x": -8, "y": 0.5, "z": 26 }, "halfExtents": { "x": 4, "y": 0.25, "z": 4 }, "rotationY": -0.1, "color": 14277081 },
+    { "position": { "x": 0, "y": 1, "z": 32 }, "halfExtents": { "x": 8, "y": 0.25, "z": 6 }, "rotationY": 0, "color": 14737632 },
+    { "position": { "x": 0, "y": 1.5, "z": 38 }, "halfExtents": { "x": 4, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 15132390 },
+    { "position": { "x": 4, "y": 0, "z": 5 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 8947848 },
+    { "position": { "x": -4, "y": 0, "z": 11 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 8947848 },
+    { "position": { "x": 5, "y": 0, "z": 17 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 8947848 },
+    { "position": { "x": -5, "y": 0, "z": 23 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 8947848 },
+    { "position": { "x": 3, "y": 0.5, "z": 29 }, "halfExtents": { "x": 1, "y": 0.125, "z": 1 }, "rotationY": 0, "color": 8947848 }
+  ],
+  "obstacles": [
+    { "type": "jump_over", "position": { "x": 0, "y": 0.5, "z": 4 }, "halfExtents": { "x": 4, "y": 0.5, "z": 0.8 }, "color": 10066329 },
+    { "type": "slide_under", "position": { "x": 4, "y": 1.8, "z": 10 }, "halfExtents": { "x": 3, "y": 0.2, "z": 0.6 }, "color": 7500402 },
+    { "type": "jump_over", "position": { "x": -5, "y": 0.5, "z": 16 }, "halfExtents": { "x": 2.5, "y": 0.5, "z": 0.8 }, "color": 10066329 },
+    { "type": "jump_over", "position": { "x": 6, "y": 0.5, "z": 22 }, "halfExtents": { "x": 2.5, "y": 0.5, "z": 0.8 }, "color": 10066329 },
+    { "type": "slide_under", "position": { "x": -4, "y": 1.8, "z": 30 }, "halfExtents": { "x": 3, "y": 0.2, "z": 0.6 }, "color": 7500402 },
+    { "type": "jump_over", "position": { "x": 0, "y": 0.5, "z": 35 }, "halfExtents": { "x": 3, "y": 0.5, "z": 0.8 }, "color": 10066329 }
+  ],
+  "dogRoute": [
+    { "position": { "x": 0, "y": 0, "z": -28 } },
+    { "position": { "x": 0, "y": 0, "z": -15 } },
+    { "position": { "x": 0, "y": 0, "z": -5 } },
+    { "position": { "x": 8, "y": 0, "z": 8 } },
+    { "position": { "x": -8, "y": 0, "z": 14 } },
+    { "position": { "x": 10, "y": 0, "z": 20 } },
+    { "position": { "x": -8, "y": 0.5, "z": 26 } },
+    { "position": { "x": 0, "y": 1, "z": 32 } },
+    { "position": { "x": 0, "y": 1.5, "z": 40 } }
+  ],
+  "dogTuning": {
+    "patrolSpeed": 6.0,
+    "chaseSpeed": 13.0,
+    "catchRadius": 1.2,
+    "patrolDistance": 6.0
+  },
+  "helicopterPart": {
+    "position": { "x": 0, "y": 2, "z": 18 },
+    "partId": "main_ignition"
+  },
+  "safeZone": {
+    "position": { "x": 0, "y": 2, "z": 40 },
+    "radius": 4,
+    "requiresPart": true
+  },
+  "powerups": [
+    { "position": { "x": 4, "y": 1, "z": 5 }, "type": "speed_boost", "duration": 6 },
+    { "position": { "x": -5, "y": 1, "z": 17 }, "type": "shield", "duration": 10 },
+    { "position": { "x": 10, "y": 1, "z": 8 }, "type": "dog_repel", "duration": 6 },
+    { "position": { "x": 3, "y": 1.5, "z": 29 }, "type": "speed_boost", "duration": 8 }
+  ],
+  "hazards": [
+    { "type": "falling_ice", "position": { "x": 3, "y": 6, "z": 6 }, "halfExtents": { "x": 0.8, "y": 1.5, "z": 0.8 }, "triggerRadius": 3, "fallDelay": 0.7, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": -3, "y": 6, "z": 13 }, "halfExtents": { "x": 0.8, "y": 1.5, "z": 0.8 }, "triggerRadius": 3, "fallDelay": 0.6, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": 5, "y": 6, "z": 19 }, "halfExtents": { "x": 0.8, "y": 1.5, "z": 0.8 }, "triggerRadius": 3, "fallDelay": 0.8, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": -5, "y": 6, "z": 25 }, "halfExtents": { "x": 0.8, "y": 1.5, "z": 0.8 }, "triggerRadius": 3, "fallDelay": 0.7, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": 0, "y": 6, "z": 31 }, "halfExtents": { "x": 0.8, "y": 1.5, "z": 0.8 }, "triggerRadius": 3, "fallDelay": 0.8, "color": 13553358 },
+    { "type": "cracked_ice", "position": { "x": 4, "y": 0.25, "z": 2 }, "halfExtents": { "x": 2, "y": 0.08, "z": 1.5 }, "color": 8966399 },
+    { "type": "cracked_ice", "position": { "x": -4, "y": 0.25, "z": 28 }, "halfExtents": { "x": 2, "y": 0.08, "z": 2 }, "color": 8966399 },
+    { "type": "sliding_ice", "position": { "x": 3, "y": 0.25, "z": 21 }, "halfExtents": { "x": 2, "y": 0.08, "z": 2 }, "color": 13553358 },
+    { "type": "sliding_ice", "position": { "x": -3, "y": 0.25, "z": 33 }, "halfExtents": { "x": 2, "y": 0.08, "z": 2 }, "color": 13553358 }
+  ]
+}
