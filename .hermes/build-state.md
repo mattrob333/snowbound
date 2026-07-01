@@ -3,7 +3,7 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** Phase 9 complete — SaveService, LevelSelectScreen, and save wiring. 195 tests green.
+**Status:** Phase 10 complete — all 15 levels built as JSON with terrain, obstacles, dog routes, hazards, and powerups. 195 tests green.
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 3m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
@@ -20,7 +20,7 @@
 8. [x] Phase 7 — Monster chase director
 9. [x] Phase 8 — Hazard system
 10. [x] Phase 9 — Save and progression
-11. [ ] Phase 10 — Build all 15 levels
+11. [x] Phase 10 — Build all 15 levels
 12. [ ] Phase 11 — Audio, animation, polish
 
 ## Completed Tasks
@@ -34,12 +34,13 @@
 - **Phase 7:** MonsterChaseDirector + MonsterDog (brown capsule, route-based movement with patrol/chase states) + MonsterDistanceModel (gap calculation with close/catch thresholds, configurable). Dog moves along route waypoints; stays patrolDistance behind player during patrol; chases at chaseSpeed after part pickup; catch condition fires onCatchPlayer callback. Hud.ts: dog close warning element (red bottom bar, fades in when dog ≤ 8 units). Dog collision group added to CollisionGroups. 152 tests passing (19 suites).
 - **Phase 8:** Hazard base class (IGameEntity, template-method with trigger-radius detection, activate/spent lifecycle). FallingIceHazard (trigger zone + delayed falling ice block with icosahedron visual + dynamic physics body + onMajorHazard callback). CrackedIceHazard (stumble zone with cracked-color visual update + timer-based lifecycle). Dog gap penalty (hazards advance dog progress via MonsterChaseDirector.closeDogGap()). Game over callback (onMajorHazard on Hazard base, wired via FallingIceHazard). LevelManager creates hazards from JSON and wires dog gap penalty. 181 tests passing (22 suites).
 - **Phase 9:** SaveService (localStorage persistence with load/save/reset/migration), LevelSaveData/SaveData interfaces, GameApp wired to save on level complete/part collect/upgrade acquire. LevelSelectScreen (DOM-based 15-level grid, unlock sequencing, stats display, reset save with confirmation). 195 tests passing (23 suites).
+- **Phase 10:** All 15 levels built as JSON in `public/assets/levels/`. Each level has meta description, atmosphere settings, player spawn, terrain pieces, obstacles (jump_over/slide_under/crumbling), dog route waypoints, dog tuning (increasing difficulty from patrolSpeed 3→6, chaseSpeed 7→13), helicopter part spawn, safe zone, powerups, and hazards (cracked_ice/falling_ice/sliding_ice/avalanche). Difficulty curve progresses from simple tutorial (Crash Site) through mazes and blizzards to the finale (Helicopter Landing). 195 tests passing (23 suites).
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 10: Build level-01.json content — terrain layout, obstacles, helicopter parts, dog waypoints, and hazard spawns. Each level needs detailed platforming routes, obstacles, pickups, and dog chase tuning.
+- Phase 11: Audio, animation, polish — placeholder animations for Jim and dog, sound effects (pickup, dog, hazards, footsteps), chase music layers, snow particle system, camera shake on hazards, victory sequence.
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -56,4 +57,4 @@ _(none yet)_
 - PlayerUpgradeService stores upgrades in-memory for now; will integrate with SaveService (Phase 9).
 - UpgradePickup uses an OctahedronGeometry (different from Pickup's box and PowerupPickup's box) to visually distinguish permanent upgrades from temporary powerups.
 
-**Last Updated:** 2026-07-01 — Phase 9 complete. SaveService + LevelSelectScreen wired. (195 tests)
+**Last Updated:** 2026-07-01 — Phase 10 complete. All 15 levels built. (195 tests)
