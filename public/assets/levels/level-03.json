@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "id": "level-03",
+    "name": "Snowy Cliffs",
+    "description": "Navigate the cliffside paths. Use wall-runs to cross gaps and find the landing skid.",
+    "order": 3
+  },
+  "atmosphere": {
+    "fogColor": 12632256,
+    "fogDensity": 0.006,
+    "ambientIntensity": 0.55,
+    "directionalIntensity": 0.85
+  },
+  "playerSpawn": { "x": 0, "y": 2, "z": -8 },
+  "terrain": [
+    { "position": { "x": 0, "y": -0.5, "z": 0 }, "halfExtents": { "x": 6, "y": 0.5, "z": 8 }, "rotationY": 0, "color": 14277081 },
+    { "position": { "x": 12, "y": 0, "z": 6 }, "halfExtents": { "x": 4, "y": 0.25, "z": 3 }, "rotationY": 0, "color": 13684944 },
+    { "position": { "x": 0, "y": 0.5, "z": 12 }, "halfExtents": { "x": 3, "y": 0.25, "z": 3 }, "rotationY": 0, "color": 14737632 },
+    { "position": { "x": -12, "y": 0, "z": 18 }, "halfExtents": { "x": 4, "y": 0.25, "z": 3 }, "rotationY": 0, "color": 13684944 },
+    { "position": { "x": 0, "y": 0.5, "z": 24 }, "halfExtents": { "x": 5, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 14737632 },
+    { "position": { "x": -6, "y": -0.5, "z": -2 }, "halfExtents": { "x": 0.5, "y": 0.5, "z": 4 }, "rotationY": 0, "color": 10526880 },
+    { "position": { "x": 6, "y": -0.5, "z": 4 }, "halfExtents": { "x": 0.5, "y": 0.5, "z": 4 }, "rotationY": 0, "color": 10526880 },
+    { "position": { "x": -16, "y": 0, "z": 15 }, "halfExtents": { "x": 2, "y": 0.25, "z": 2 }, "rotationY": 0, "color": 13158600 },
+    { "position": { "x": 16, "y": 0, "z": 15 }, "halfExtents": { "x": 2, "y": 0.25, "z": 2 }, "rotationY": 0, "color": 13158600 }
+  ],
+  "obstacles": [
+    { "type": "slide_under", "position": { "x": 0, "y": 1.8, "z": 5 }, "halfExtents": { "x": 4, "y": 0.2, "z": 0.8 }, "color": 10066329 },
+    { "type": "jump_over", "position": { "x": 0, "y": 0.5, "z": 9 }, "halfExtents": { "x": 2.5, "y": 0.5, "z": 1 }, "color": 12434877 },
+    { "type": "jump_over", "position": { "x": 5, "y": 0.5, "z": 14 }, "halfExtents": { "x": 1.5, "y": 0.5, "z": 0.8 }, "color": 12434877 },
+    { "type": "slide_under", "position": { "x": -5, "y": 1.8, "z": 20 }, "halfExtents": { "x": 3, "y": 0.2, "z": 0.8 }, "color": 10066329 },
+    { "type": "jump_over", "position": { "x": 0, "y": 0.75, "z": 27 }, "halfExtents": { "x": 3, "y": 0.5, "z": 1 }, "color": 12434877 }
+  ],
+  "dogRoute": [
+    { "position": { "x": 0, "y": 0, "z": -25 } },
+    { "position": { "x": 0, "y": 0, "z": -10 } },
+    { "position": { "x": 6, "y": 0, "z": -2 } },
+    { "position": { "x": 12, "y": 0, "z": 6 } },
+    { "position": { "x": 0, "y": 0.5, "z": 12 } },
+    { "position": { "x": -12, "y": 0, "z": 18 } },
+    { "position": { "x": 0, "y": 0.5, "z": 26 } }
+  ],
+  "dogTuning": {
+    "patrolSpeed": 3.5,
+    "chaseSpeed": 8.5,
+    "catchRadius": 1.2,
+    "patrolDistance": 12.0
+  },
+  "helicopterPart": {
+    "position": { "x": 0, "y": 2, "z": 14 },
+    "partId": "landing_skid"
+  },
+  "safeZone": {
+    "position": { "x": 0, "y": 1.5, "z": 30 },
+    "radius": 3,
+    "requiresPart": true
+  },
+  "powerups": [
+    { "position": { "x": -16, "y": 1, "z": 15 }, "type": "speed_boost", "duration": 5 },
+    { "position": { "x": 16, "y": 1, "z": 15 }, "type": "dog_repel", "duration": 6 }
+  ],
+  "hazards": [
+    { "type": "falling_ice", "position": { "x": 3, "y": 7, "z": 7 }, "halfExtents": { "x": 1, "y": 1.5, "z": 1 }, "triggerRadius": 3, "fallDelay": 1.2, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": -3, "y": 7, "z": 17 }, "halfExtents": { "x": 1, "y": 1.5, "z": 1 }, "triggerRadius": 3, "fallDelay": 1.0, "color": 13553358 }
+  ]
+}

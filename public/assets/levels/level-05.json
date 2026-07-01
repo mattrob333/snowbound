@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "id": "level-05",
+    "name": "Ice Caves",
+    "description": "Dangerous ice caves with falling icicles. Find the tail rotor and escape before the cave collapses.",
+    "order": 5
+  },
+  "atmosphere": {
+    "fogColor": 7834274,
+    "fogDensity": 0.012,
+    "ambientIntensity": 0.35,
+    "directionalIntensity": 0.5
+  },
+  "playerSpawn": { "x": 0, "y": 2, "z": -6 },
+  "terrain": [
+    { "position": { "x": 0, "y": -0.5, "z": 0 }, "halfExtents": { "x": 6, "y": 0.5, "z": 5 }, "rotationY": 0, "color": 11184810 },
+    { "position": { "x": 8, "y": 0, "z": 6 }, "halfExtents": { "x": 3, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 11184810 },
+    { "position": { "x": 0, "y": 0, "z": 12 }, "halfExtents": { "x": 4, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 11184810 },
+    { "position": { "x": -8, "y": 0, "z": 18 }, "halfExtents": { "x": 3, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 11184810 },
+    { "position": { "x": 0, "y": 0.5, "z": 24 }, "halfExtents": { "x": 6, "y": 0.25, "z": 5 }, "rotationY": 0, "color": 11842740 },
+    { "position": { "x": 6, "y": 0.5, "z": 8 }, "halfExtents": { "x": 1.5, "y": 0.125, "z": 1.5 }, "rotationY": 0, "color": 10526880 },
+    { "position": { "x": -6, "y": 0.5, "z": 15 }, "halfExtents": { "x": 1.5, "y": 0.125, "z": 1.5 }, "rotationY": 0, "color": 10526880 }
+  ],
+  "obstacles": [
+    { "type": "slide_under", "position": { "x": 0, "y": 1.8, "z": 4 }, "halfExtents": { "x": 4, "y": 0.2, "z": 0.6 }, "color": 8947848 },
+    { "type": "jump_over", "position": { "x": 0, "y": 0.5, "z": 9 }, "halfExtents": { "x": 2, "y": 0.5, "z": 0.8 }, "color": 10066329 },
+    { "type": "jump_over", "position": { "x": -4, "y": 0.5, "z": 15 }, "halfExtents": { "x": 2, "y": 0.5, "z": 0.8 }, "color": 10066329 },
+    { "type": "jump_over", "position": { "x": 4, "y": 0.5, "z": 21 }, "halfExtents": { "x": 2, "y": 0.5, "z": 0.8 }, "color": 10066329 }
+  ],
+  "dogRoute": [
+    { "position": { "x": 0, "y": 0, "z": -20 } },
+    { "position": { "x": 0, "y": 0, "z": -8 } },
+    { "position": { "x": 0, "y": 0, "z": 2 } },
+    { "position": { "x": 8, "y": 0, "z": 6 } },
+    { "position": { "x": 0, "y": 0, "z": 12 } },
+    { "position": { "x": -8, "y": 0, "z": 18 } },
+    { "position": { "x": 0, "y": 0.5, "z": 24 } },
+    { "position": { "x": 0, "y": 0.5, "z": 28 } }
+  ],
+  "dogTuning": {
+    "patrolSpeed": 4.0,
+    "chaseSpeed": 9.5,
+    "catchRadius": 1.2,
+    "patrolDistance": 10.0
+  },
+  "helicopterPart": {
+    "position": { "x": 0, "y": 2, "z": 16 },
+    "partId": "tail_rotor"
+  },
+  "safeZone": {
+    "position": { "x": 0, "y": 1, "z": 28 },
+    "radius": 3,
+    "requiresPart": true
+  },
+  "powerups": [
+    { "position": { "x": 6, "y": 1, "z": 8 }, "type": "shield", "duration": 8 }
+  ],
+  "hazards": [
+    { "type": "falling_ice", "position": { "x": 2, "y": 5, "z": 5 }, "halfExtents": { "x": 0.8, "y": 1.2, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 1.0, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": -2, "y": 5, "z": 8 }, "halfExtents": { "x": 0.8, "y": 1.2, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 1.2, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": 3, "y": 5, "z": 13 }, "halfExtents": { "x": 0.8, "y": 1.2, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 0.8, "color": 13553358 },
+    { "type": "falling_ice", "position": { "x": -3, "y": 5, "z": 20 }, "halfExtents": { "x": 0.8, "y": 1.2, "z": 0.8 }, "triggerRadius": 2.5, "fallDelay": 1.0, "color": 13553358 },
+    { "type": "cracked_ice", "position": { "x": 2, "y": 0.25, "z": 2 }, "halfExtents": { "x": 1.5, "y": 0.08, "z": 1.5 }, "color": 8966399 }
+  ]
+}
