@@ -78,12 +78,12 @@
 - [x] Game over on major hazards (onMajorHazard callback on Hazard base, wired via FallingIceHazard)
 
 ## Phase 9: Save and progression
-- [ ] SaveService (localStorage)
-- [ ] Save after level complete
-- [ ] Save collected parts
-- [ ] Save permanent upgrades
-- [ ] Level select / unlock
-- [ ] Reset save option
+- [x] SaveService (localStorage)
+- [x] Save after level complete
+- [x] Save collected parts
+- [x] Save permanent upgrades
+- [x] Level select / unlock
+- [x] Reset save option
 
 ## Phase 10: Build all 15 levels
 - [ ] Level 1 — Crash Site (rotor blade, basic run/jump)

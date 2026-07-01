@@ -88,6 +88,16 @@ export class Hud {
     this.attached = false;
   }
 
+  /** Show the HUD (fade in) */
+  show(): void {
+    this.container.style.opacity = '1';
+  }
+
+  /** Hide the HUD (fade out) */
+  hide(): void {
+    this.container.style.opacity = '0';
+  }
+
   /**
    * Determine the current objective state based on game context.
    * Returns the objective to display (or 'none' for no objective).

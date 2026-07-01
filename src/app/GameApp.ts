@@ -9,10 +9,12 @@ import { LevelManager } from '../gameplay/levels/LevelManager';
 import { SaveService } from '../gameplay/save/SaveService';
 import { DebugOverlay } from '../engine/debug/DebugOverlay';
 import { GameLoop } from './GameLoop';
-import { SceneStateMachine, AppState } from './SceneStateMachine';
+import { SceneStateMachine } from './SceneStateMachine';
 import { Player } from '../gameplay/player/Player';
+import { PlayerUpgradeService } from '../gameplay/player/PlayerUpgradeService';
 import { ThirdPersonCameraRig } from '../engine/camera/ThirdPersonCameraRig';
 import { Hud } from '../gameplay/ui/Hud';
+import { LevelSelectScreen } from '../gameplay/ui/LevelSelectScreen';
 import { CAMERA_DISTANCE } from '../config/constants';
 import type { GameContext } from './GameContext';
 
@@ -21,6 +23,14 @@ export class GameApp {
   private stateMachine = new SceneStateMachine();
   private loop = new GameLoop();
   private hud = new Hud();
+  private levelSelectScreen: LevelSelectScreen | null = null;
+  private saveService: SaveService;
+  private playerUpgradeService: PlayerUpgradeService;
+
+  constructor() {
+    this.saveService = new SaveService();
+    this.playerUpgradeService = new PlayerUpgradeService(this.saveService.getUpgrades());
+  }
 
   async init(container: HTMLElement): Promise<void> {
     console.log('[Snowbound] Initializing...');
@@ -28,65 +38,66 @@ export class GameApp {
     const renderer = new ThreeRenderer();
     container.appendChild(renderer.renderer.domElement);
 
-    // Attach HUD overlay to the container
+    // Attach HUD overlay
     this.hud.attach(container);
+    this.hud.hide(); // Hidden until a level is active
 
-    // Attach input to window
+    // Level select screen
+    this.levelSelectScreen = new LevelSelectScreen(
+      this.saveService,
+      (levelId) => this.startLevel(levelId),
+      () => this.showLevelSelect(),
+    );
+    this.levelSelectScreen.attach(container);
+    this.levelSelectScreen.show();
+
+    // Attach input
     const input = new InputManager();
     input.attach(window);
 
-    // Add placeholder snowy ground
+    // Scene setup
     const groundGeo = new THREE.PlaneGeometry(200, 200);
     const groundMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.8,
-      metalness: 0.0,
+      color: 0xffffff, roughness: 0.8, metalness: 0.0,
     });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.5;
     ground.receiveShadow = true;
-    renderer.scene.add(ground);
 
-    // Add hemisphere light
     const hemiLight = new THREE.HemisphereLight(0x87ceeb, 0xffffff, 0.8);
-    renderer.scene.add(hemiLight);
-
-    // Add directional light
     const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
     dirLight.position.set(10, 20, 10);
     dirLight.castShadow = true;
-    renderer.scene.add(dirLight);
 
-    // Fog
-    renderer.scene.fog = new THREE.Fog(0xbbc4d0, 30, 120);
-
-    // Debug grid
     const grid = new THREE.GridHelper(100, 20, 0x444444, 0x666666);
+
+    renderer.scene.add(ground);
+    renderer.scene.add(hemiLight);
+    renderer.scene.add(dirLight);
+    renderer.scene.fog = new THREE.Fog(0xbbc4d0, 30, 120);
     renderer.scene.add(grid);
 
+    // Physics
     const physics = new PhysicsWorld();
     await physics.init();
-
-    // Add static ground collider matching the visual snow plane
     physics.addStaticGroundCollider(200, -0.5);
 
-    // Create third-person camera rig
+    // Camera rig
     const cameraRig = new ThirdPersonCameraRig(renderer.camera);
     cameraRig.setAzimuth(0);
     cameraRig.setDistance(CAMERA_DISTANCE);
 
-    // Create the player (includes CharacterKCC + PlayerController)
+    // Player
     const player = new Player(physics, cameraRig);
     player.mesh.position.set(0, 4, 0);
     renderer.scene.add(player.mesh);
 
+    // Systems
     const entityManager = new EntityManager();
     const assets = new AssetManager();
     const audio = new AudioManager();
     const levelManager = new LevelManager(physics, renderer);
-    const saveService = new SaveService();
-    const debug = new DebugOverlay();
 
     this.ctx = {
       renderer,
@@ -96,21 +107,73 @@ export class GameApp {
       input,
       entityManager,
       levelManager,
-      saveService,
-      debug,
+      saveService: this.saveService,
+      playerUpgradeService: this.playerUpgradeService,
+      debug: new DebugOverlay(),
       player,
       clock: { elapsed: 0, delta: 0 },
     };
 
-    // Load the first level (level-01) with entity manager for pickups/safe zone
-    levelManager.loadLevel('level-01', entityManager, () => {
-      player.partCollected = true;
-    }).catch((err) => {
-      console.error('[Snowbound] Failed to load level-01:', err);
+    // Wire upgrade pickup persistence: whenever PlayerUpgradeService adds an upgrade,
+    // also persist to SaveService. Monkey-patch addUpgrade to be safe.
+    const origAddUpgrade = this.playerUpgradeService.addUpgrade.bind(this.playerUpgradeService);
+    this.playerUpgradeService.addUpgrade = (type) => {
+      origAddUpgrade(type);
+      this.saveService.addUpgrade(type);
+    };
+
+    this.stateMachine.setState('Boot' as never);
+    console.log('[Snowbound] Ready.');
+    this.loop.start(this.ctx, () => this.hud.update(this.ctx.clock.delta, this.ctx));
+  }
+
+  /**
+   * Load a level and wire save callbacks.
+   */
+  private async loadLevelWithSave(levelId: string, entityManager: EntityManager): Promise<void> {
+    const ctx = this.ctx;
+
+    await ctx.levelManager.loadLevel(levelId, entityManager, () => {
+      // On part collect: mark player state and persist to save
+      ctx.player.partCollected = true;
+      ctx.saveService.addPart();
     });
 
-    this.stateMachine.setState(AppState.Boot);
-    console.log('[Snowbound] Ready. Starting game loop.');
-    this.loop.start(this.ctx, () => this.hud.update(this.ctx.clock.delta, this.ctx));
+    // Wire level complete callback on the safe zone
+    if (ctx.levelManager.safeZone) {
+      ctx.levelManager.safeZone.onLevelComplete = () => {
+        if (!ctx.levelManager.currentId) return;
+        const partsCollected = 1;
+        ctx.saveService.completeLevel(
+          ctx.levelManager.currentId,
+          ctx.clock.elapsed,
+          partsCollected,
+          ctx.playerUpgradeService.count,
+          ctx.levelManager.chaseDirector?.caught !== true,
+          );
+        ctx.saveService.setLastLevelId(ctx.levelManager.currentId);
+        console.log(`[Save] Level ${ctx.levelManager.currentId} saved on completion.`);
+      };
+    }
+  }
+
+  /**
+   * Start a specific level from the level select screen.
+   */
+  private async startLevel(levelId: string): Promise<void> {
+    this.levelSelectScreen?.hide();
+    this.hud.show();
+
+    await this.loadLevelWithSave(levelId, this.ctx.entityManager);
+    this.ctx.player.resetLevelState();
+    this.ctx.player.mesh.position.set(0, 4, 0);
+  }
+
+  /**
+   * Show the level select screen.
+   */
+  private showLevelSelect(): void {
+    this.hud.hide();
+    this.levelSelectScreen?.show();
   }
 }

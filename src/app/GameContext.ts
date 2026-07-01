@@ -8,6 +8,7 @@ import type { LevelManager } from '../gameplay/levels/LevelManager';
 import type { SaveService } from '../gameplay/save/SaveService';
 import type { DebugOverlay } from '../engine/debug/DebugOverlay';
 import type { Player } from '../gameplay/player/Player';
+import type { PlayerUpgradeService } from '../gameplay/player/PlayerUpgradeService';
 
 export interface GameClock {
   elapsed: number;
@@ -23,6 +24,7 @@ export interface GameContext {
   entityManager: EntityManager;
   levelManager: LevelManager;
   saveService: SaveService;
+  playerUpgradeService: PlayerUpgradeService;
   debug: DebugOverlay;
   player: Player;
   clock: GameClock;

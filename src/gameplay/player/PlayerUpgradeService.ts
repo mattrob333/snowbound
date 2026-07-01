@@ -55,6 +55,15 @@ export class PlayerUpgradeService {
   private upgrades: Set<UpgradeType> = new Set();
   private _enabled = true;
 
+  /**
+   * @param initialUpgrades Pre-loaded upgrades from SaveService (empty by default)
+   */
+  constructor(initialUpgrades: UpgradeType[] = []) {
+    for (const type of initialUpgrades) {
+      this.upgrades.add(type);
+    }
+  }
+
   /** Get the list of all collected upgrades */
   getCollected(): UpgradeType[] {
     return Array.from(this.upgrades);
