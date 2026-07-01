@@ -58,6 +58,7 @@ export class MonsterDog implements IGameEntity {
   private _slipCooldown: number = 0;
   /** Previous state before slip triggered (to restore after slip ends) */
   private _previousState: DogState = 'patrol';
+  private eyeMeshes: THREE.Mesh[] = [];
 
   constructor(
     routePath: RoutePath,
@@ -93,6 +94,20 @@ export class MonsterDog implements IGameEntity {
     if (renderer) {
       renderer.scene.add(this.mesh);
       this.renderer = renderer;
+    }
+
+    // Add glowing red eyes at the top of the capsule
+    const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
+    const eyeMat = new THREE.MeshStandardMaterial({
+      color: 0xff0000,
+      emissive: 0xff0000,
+      emissiveIntensity: 2.0,
+    });
+    for (const side of [-1, 1]) {
+      const eye = new THREE.Mesh(eyeGeo, eyeMat);
+      eye.position.set(side * 0.3, DOG_HEIGHT / 2 - 0.2, 0.6);
+      this.mesh.add(eye);
+      this.eyeMeshes.push(eye);
     }
 
     // Start spatial audio for the dog's growl if audio manager available
@@ -288,6 +303,17 @@ export class MonsterDog implements IGameEntity {
       this.audioHandle.stop();
       this.audioHandle = null;
     }
+    // Remove eye meshes
+    for (const eye of this.eyeMeshes) {
+      this.mesh.remove(eye);
+      eye.geometry.dispose();
+      if (Array.isArray(eye.material)) {
+        for (const m of eye.material) m.dispose();
+      } else if (eye.material) {
+        eye.material.dispose();
+      }
+    }
+    this.eyeMeshes = [];
     if (this.renderer) {
       this.renderer.scene.remove(this.mesh);
     }

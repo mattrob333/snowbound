@@ -72,18 +72,6 @@ describe('LevelLoader', () => {
     expect(runtime.obstacleBodies.length).toBe(2);
   });
 
-  it('should spawn helicopter part mesh and body', () => {
-    const runtime = loader.spawnLevel(sampleLevel);
-    expect(runtime.partMesh).not.toBeNull();
-    expect(runtime.partBody).not.toBeNull();
-  });
-
-  it('should spawn safe zone mesh and body', () => {
-    const runtime = loader.spawnLevel(sampleLevel);
-    expect(runtime.safeZoneMesh).not.toBeNull();
-    expect(runtime.safeZoneBody).not.toBeNull();
-  });
-
   it('should unload a level and remove all bodies from physics world', () => {
     const runtime = loader.spawnLevel(sampleLevel);
     const bodyCountBefore = physics.world.bodies.len();
@@ -91,7 +79,7 @@ describe('LevelLoader', () => {
     loader.unloadLevel(runtime);
 
     const bodyCountAfter = physics.world.bodies.len();
-    const expectedRemoved = 2 + 2 + 1 + 1; // terrain + obstacles + part + safeZone
+    const expectedRemoved = 2 + 2; // terrain + obstacles (no raw part/safeZone — handled by entities)
     expect(bodyCountAfter).toBe(bodyCountBefore - expectedRemoved);
   });
 

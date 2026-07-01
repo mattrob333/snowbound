@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import RAPIER from '@dimforge/rapier3d-compat';
 import type { PhysicsWorld } from '../../engine/physics/PhysicsWorld';
 import type { ThreeRenderer } from '../../engine/rendering/ThreeRenderer';
-import type { LevelData, TerrainPiece, ObstacleData, HelicopterPartSpawn, SafeZoneData } from './LevelData';
+import type { LevelData, TerrainPiece, ObstacleData } from './LevelData';
 import { CollisionGroups } from '../../engine/physics/CollisionGroups';
 
 /** Runtime handle for a loaded level — tracks spawned objects for cleanup */
@@ -14,10 +14,6 @@ export interface LevelRuntime {
   obstacleBodies: RAPIER.RigidBody[];
   hazardMeshes: THREE.Mesh[];
   hazardBodies: RAPIER.RigidBody[];
-  partMesh: THREE.Mesh | null;
-  partBody: RAPIER.RigidBody | null;
-  safeZoneMesh: THREE.Mesh | null;
-  safeZoneBody: RAPIER.RigidBody | null;
   playerSpawn: { x: number; y: number; z: number };
 }
 
@@ -61,10 +57,6 @@ export class LevelLoader {
       obstacleBodies: [],
       hazardMeshes: [],
       hazardBodies: [],
-      partMesh: null,
-      partBody: null,
-      safeZoneMesh: null,
-      safeZoneBody: null,
       playerSpawn: { x: data.playerSpawn.x, y: data.playerSpawn.y, z: data.playerSpawn.z },
     };
 
@@ -78,18 +70,6 @@ export class LevelLoader {
       const { mesh, body } = this.spawnObstacle(obs);
       runtime.obstacleMeshes.push(mesh);
       runtime.obstacleBodies.push(body);
-    }
-
-    if (data.helicopterPart) {
-      const { mesh, body } = this.spawnHelicopterPart(data.helicopterPart);
-      runtime.partMesh = mesh;
-      runtime.partBody = body;
-    }
-
-    {
-      const { mesh, body } = this.spawnSafeZone(data.safeZone);
-      runtime.safeZoneMesh = mesh;
-      runtime.safeZoneBody = body;
     }
 
     for (const haz of data.hazards) {
@@ -108,8 +88,6 @@ export class LevelLoader {
       ...runtime.obstacleMeshes,
       ...runtime.hazardMeshes,
     ];
-    if (runtime.partMesh) allMeshes.push(runtime.partMesh);
-    if (runtime.safeZoneMesh) allMeshes.push(runtime.safeZoneMesh);
 
     for (const mesh of allMeshes) {
       if (mesh.geometry) mesh.geometry.dispose();
@@ -128,8 +106,6 @@ export class LevelLoader {
       ...runtime.obstacleBodies,
       ...runtime.hazardBodies,
     ];
-    if (runtime.partBody) allBodies.push(runtime.partBody);
-    if (runtime.safeZoneBody) allBodies.push(runtime.safeZoneBody);
 
     for (const body of allBodies) {
       this.physics.removeRigidBody(body);
@@ -202,55 +178,6 @@ export class LevelLoader {
     const body = this.physics.addRigidBody(bodyDesc);
     const colliderDesc = RAPIER.ColliderDesc.cuboid(obs.halfExtents.x, obs.halfExtents.y, obs.halfExtents.z)
       .setCollisionGroups(CollisionGroups.Obstacle);
-    this.physics.addCollider(colliderDesc, body);
-
-    return { mesh, body };
-  }
-
-  private spawnHelicopterPart(spawn: HelicopterPartSpawn): { mesh: THREE.Mesh; body: RAPIER.RigidBody } {
-    const geometry = new THREE.BoxGeometry(0.4, 0.4, 0.4);
-    const material = new THREE.MeshLambertMaterial({ color: 0xffdd44, emissive: 0x442200 });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(spawn.position.x, spawn.position.y, spawn.position.z);
-
-    if (this.renderer) {
-      this.renderer.scene.add(mesh);
-    }
-
-    const bodyDesc = RAPIER.RigidBodyDesc.fixed()
-      .setTranslation(spawn.position.x, spawn.position.y, spawn.position.z);
-    const body = this.physics.addRigidBody(bodyDesc);
-    const colliderDesc = RAPIER.ColliderDesc.cuboid(0.2, 0.2, 0.2)
-      .setCollisionGroups(CollisionGroups.Pickup)
-      .setSensor(true);
-    this.physics.addCollider(colliderDesc, body);
-
-    return { mesh, body };
-  }
-
-  private spawnSafeZone(zone: SafeZoneData): { mesh: THREE.Mesh; body: RAPIER.RigidBody } {
-    const segments = 24;
-    const geometry = new THREE.CircleGeometry(zone.radius, segments);
-    const material = new THREE.MeshLambertMaterial({
-      color: 0x44aaff,
-      transparent: true,
-      opacity: 0.3,
-      side: THREE.DoubleSide,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.position.set(zone.position.x, zone.position.y + 0.05, zone.position.z);
-
-    if (this.renderer) {
-      this.renderer.scene.add(mesh);
-    }
-
-    const bodyDesc = RAPIER.RigidBodyDesc.fixed()
-      .setTranslation(zone.position.x, zone.position.y, zone.position.z);
-    const body = this.physics.addRigidBody(bodyDesc);
-    const colliderDesc = RAPIER.ColliderDesc.cylinder(0.5, zone.radius)
-      .setCollisionGroups(CollisionGroups.SafeZone)
-      .setSensor(true);
     this.physics.addCollider(colliderDesc, body);
 
     return { mesh, body };

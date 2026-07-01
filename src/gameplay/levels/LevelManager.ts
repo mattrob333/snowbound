@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { LevelLoader, type LevelRuntime } from './LevelLoader';
 import type { LevelData, HazardSpawn, AABB } from './LevelData';
 import type { PhysicsWorld } from '../../engine/physics/PhysicsWorld';
@@ -261,34 +260,9 @@ export class LevelManager {
     this._safeZone = null;
   }
 
-  private removeRawObjectivePlaceholders(runtime: LevelRuntime): void {
-    this.disposeRuntimeMesh(runtime.partMesh);
-    runtime.partMesh = null;
-    if (runtime.partBody) {
-      this.physics.removeRigidBody(runtime.partBody);
-      runtime.partBody = null;
-    }
-
-    this.disposeRuntimeMesh(runtime.safeZoneMesh);
-    runtime.safeZoneMesh = null;
-    if (runtime.safeZoneBody) {
-      this.physics.removeRigidBody(runtime.safeZoneBody);
-      runtime.safeZoneBody = null;
-    }
+  private removeRawObjectivePlaceholders(_runtime: LevelRuntime): void {
+    // No-op: LevelLoader no longer spawns raw part/safezone placeholders.
+    // HelicopterPartPickup and SafeZone entities handle their own creation.
   }
 
-  private disposeRuntimeMesh(mesh: THREE.Mesh | null): void {
-    if (!mesh) return;
-    if (this.renderer) {
-      this.renderer.scene.remove(mesh);
-    }
-    mesh.geometry.dispose();
-    if (Array.isArray(mesh.material)) {
-      for (const material of mesh.material) {
-        material.dispose();
-      }
-    } else {
-      mesh.material.dispose();
-    }
   }
-}
