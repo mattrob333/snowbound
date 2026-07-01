@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "id": "level-02",
+    "name": "Frozen Forest",
+    "description": "The trail leads through a frozen forest. Dodge fallen trees and find the battery to restore helicopter power.",
+    "order": 2
+  },
+  "atmosphere": {
+    "fogColor": 11579187,
+    "fogDensity": 0.005,
+    "ambientIntensity": 0.5,
+    "directionalIntensity": 0.8
+  },
+  "playerSpawn": { "x": 0, "y": 2, "z": -10 },
+  "terrain": [
+    { "position": { "x": 0, "y": -0.5, "z": 0 }, "halfExtents": { "x": 18, "y": 0.5, "z": 10 }, "rotationY": 0, "color": 14277081 },
+    { "position": { "x": -6, "y": 0, "z": 12 }, "halfExtents": { "x": 5, "y": 0.25, "z": 4 }, "rotationY": 0.2, "color": 13684944 },
+    { "position": { "x": 6, "y": 0, "z": 18 }, "halfExtents": { "x": 5, "y": 0.25, "z": 4 }, "rotationY": -0.2, "color": 13684944 },
+    { "position": { "x": -4, "y": 0.5, "z": 24 }, "halfExtents": { "x": 4, "y": 0.25, "z": 3 }, "rotationY": 0.1, "color": 14277081 },
+    { "position": { "x": 0, "y": 1, "z": 30 }, "halfExtents": { "x": 6, "y": 0.25, "z": 4 }, "rotationY": 0, "color": 14737632 },
+    { "position": { "x": 8, "y": 0, "z": 8 }, "halfExtents": { "x": 2, "y": 0.25, "z": 2 }, "rotationY": 0, "color": 13158600 },
+    { "position": { "x": -8, "y": 0.5, "z": 8 }, "halfExtents": { "x": 2, "y": 0.25, "z": 2 }, "rotationY": 0, "color": 13158600 },
+    { "position": { "x": -12, "y": 0, "z": 16 }, "halfExtents": { "x": 2, "y": 0.25, "z": 2 }, "rotationY": 0.5, "color": 13158600 },
+    { "position": { "x": 10, "y": 0.5, "z": 22 }, "halfExtents": { "x": 2, "y": 0.25, "z": 2 }, "rotationY": -0.4, "color": 13158600 }
+  ],
+  "obstacles": [
+    { "type": "jump_over", "position": { "x": 0, "y": 0.5, "z": 3 }, "halfExtents": { "x": 4, "y": 0.5, "z": 0.8 }, "color": 6836762 },
+    { "type": "jump_over", "position": { "x": -5, "y": 0.5, "z": 10 }, "halfExtents": { "x": 3, "y": 0.6, "z": 0.8 }, "color": 6836762 },
+    { "type": "slide_under", "position": { "x": 5, "y": 1.8, "z": 15 }, "halfExtents": { "x": 3, "y": 0.2, "z": 0.8 }, "color": 7500402 },
+    { "type": "jump_over", "position": { "x": 2, "y": 0.5, "z": 20 }, "halfExtents": { "x": 3, "y": 0.5, "z": 0.8 }, "color": 6836762 },
+    { "type": "jump_over", "position": { "x": -3, "y": 0.75, "z": 26 }, "halfExtents": { "x": 3.5, "y": 0.5, "z": 0.8 }, "color": 6046258 }
+  ],
+  "dogRoute": [
+    { "position": { "x": 0, "y": 0, "z": -25 } },
+    { "position": { "x": 0, "y": 0, "z": -12 } },
+    { "position": { "x": 0, "y": 0, "z": -3 } },
+    { "position": { "x": -6, "y": 0, "z": 6 } },
+    { "position": { "x": -6, "y": 0, "z": 12 } },
+    { "position": { "x": 6, "y": 0, "z": 18 } },
+    { "position": { "x": -4, "y": 0.5, "z": 24 } },
+    { "position": { "x": 0, "y": 1, "z": 32 } }
+  ],
+  "dogTuning": {
+    "patrolSpeed": 3.5,
+    "chaseSpeed": 8.0,
+    "catchRadius": 1.2,
+    "patrolDistance": 13.0
+  },
+  "helicopterPart": {
+    "position": { "x": 0, "y": 2, "z": 14 },
+    "partId": "battery"
+  },
+  "safeZone": {
+    "position": { "x": 0, "y": 1.5, "z": 33 },
+    "radius": 3,
+    "requiresPart": true
+  },
+  "powerups": [
+    { "position": { "x": -8, "y": 1, "z": 8 }, "type": "speed_boost", "duration": 5 },
+    { "position": { "x": 8, "y": 1, "z": 22 }, "type": "shield", "duration": 8 }
+  ],
+  "hazards": [
+    { "type": "cracked_ice", "position": { "x": 3, "y": 0.25, "z": 5 }, "halfExtents": { "x": 1.5, "y": 0.1, "z": 1.5 }, "color": 8966399 },
+    { "type": "cracked_ice", "position": { "x": -3, "y": 0.25, "z": 22 }, "halfExtents": { "x": 2, "y": 0.1, "z": 1.5 }, "color": 8966399 },
+    { "type": "falling_ice", "position": { "x": 4, "y": 6, "z": 17 }, "halfExtents": { "x": 1, "y": 1.5, "z": 1 }, "triggerRadius": 3, "fallDelay": 1.5, "color": 13553358 }
+  ]
+}
