@@ -108,7 +108,7 @@
 - [x] Victory sequence — VictorySequence with 6-stage progression, 14 tests
 - [x] Dog animation controller — MonsterAnimationController state machine, 17 tests
 - [x] Jim placeholder animations
-- [ ] Dog placeholder animations (wired from MonsterAnimationController)
+- [x] Dog placeholder animations (wired from MonsterAnimationController)
 - [ ] Pickup sounds (AudioManager ready, needs wiring into game loop)
 - [ ] Dog positional audio
 - [ ] Chase music layers
