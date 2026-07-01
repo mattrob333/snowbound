@@ -111,6 +111,6 @@
 - [x] Dog placeholder animations (wired from MonsterAnimationController)
 - [x] Pickup sounds (AudioManager ready, wired into pickup collection — 'pickup', 'helicopter_part', 'powerup', 'powerup_expire', 'upgrade' sounds)
 - [x] Dog positional audio
-- [ ] Chase music layers
+- [x] Chase music layers — MusicLayerManager with patrol/chase crossfade based on dog proximity
 - [ ] Jim voice lines
 - [ ] Dog slip comedy event

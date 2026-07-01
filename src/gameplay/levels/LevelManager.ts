@@ -10,6 +10,7 @@ import { MonsterChaseDirector } from '../monster/MonsterChaseDirector';
 import { FallingIceHazard } from '../hazards/FallingIceHazard';
 import { CrackedIceHazard } from '../hazards/CrackedIceHazard';
 import type { Hazard } from '../hazards/Hazard';
+import { MusicLayerManager } from '../../engine/audio/MusicLayerManager';
 
 function createHazardFromSpawn(spawn: HazardSpawn, _runtime: LevelRuntime): Hazard | null {
   switch (spawn.type) {
@@ -43,6 +44,7 @@ export class LevelManager {
   private currentData: LevelData | null = null;
   private _safeZone: SafeZone | null = null;
   private _chaseDirector: MonsterChaseDirector | null = null;
+  private _musicLayer: MusicLayerManager | null = null;
 
   constructor(physics: PhysicsWorld, renderer: ThreeRenderer | null = null, audioManager: AudioManager | null = null) {
     this.physics = physics;
@@ -75,6 +77,11 @@ export class LevelManager {
   /** The current level's MonsterChaseDirector (null until level loads) */
   get chaseDirector(): MonsterChaseDirector | null {
     return this._chaseDirector;
+  }
+
+  /** The current level's MusicLayerManager (null until level loads, or no audio) */
+  get musicLayer(): MusicLayerManager | null {
+    return this._musicLayer;
   }
 
   /** Load a level by ID from the assets/levels/ directory */
@@ -124,11 +131,23 @@ export class LevelManager {
 
       // Create the monster chase director with dog route + tuning
       const scene = this.renderer?.scene ?? null;
+
+      // Create music layer manager for chase crossfade (if audio available)
+      if (this.audioManager) {
+        this._musicLayer = new MusicLayerManager(this.audioManager, {
+          patrolKey: 'music_patrol',
+          chaseKey: 'music_chase',
+          closeThreshold: data.dogTuning.patrolDistance * 0.5,
+          catchThreshold: data.dogTuning.catchRadius * 2,
+        });
+      }
+
       this._chaseDirector = new MonsterChaseDirector(
         data.dogRoute,
         data.dogTuning,
         scene,
         this.audioManager ?? undefined,
+        this._musicLayer ?? undefined,
       );
       entityManager.add(this._chaseDirector);
 
@@ -159,6 +178,8 @@ export class LevelManager {
     if (!this.currentRuntime) return;
     this.loader.unloadLevel(this.currentRuntime);
     this._chaseDirector?.dispose();
+    this._musicLayer?.dispose();
+    this._musicLayer = null;
     this._chaseDirector = null;
     this.currentRuntime = null;
     this.currentData = null;

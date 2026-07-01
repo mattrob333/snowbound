@@ -6,6 +6,7 @@ import { MonsterDog } from './MonsterDog';
 import { MonsterDistanceModel } from './MonsterDistanceModel';
 import type { DogTuning, DogWaypoint, Vec3 } from '../levels/LevelData';
 import type { AudioManager } from '../../engine/audio/AudioManager';
+import type { MusicLayerManager } from '../../engine/audio/MusicLayerManager';
 
 /**
  * MonsterChaseDirector — coordinates the dog chase lifecycle for a level.
@@ -38,11 +39,19 @@ export class MonsterChaseDirector implements IGameEntity {
   /** Callback fired when the dog catches the player */
   onCatchPlayer: (() => void) | null = null;
 
+  /** Optional music layer manager for chase music crossfade */
+  private _musicLayer: MusicLayerManager | null = null;
+
+  get musicLayer(): MusicLayerManager | null {
+    return this._musicLayer;
+  }
+
   constructor(
     waypoints: DogWaypoint[],
     tuning: DogTuning,
     scene: THREE.Scene | null = null,
     audioManager?: AudioManager,
+    musicLayer?: MusicLayerManager,
   ) {
     this.routePath = new RoutePath(waypoints);
     this.dog = new MonsterDog(this.routePath, tuning, scene ? { scene } : null, audioManager);
@@ -50,6 +59,7 @@ export class MonsterChaseDirector implements IGameEntity {
       8,  // close threshold — 8 units
       Math.max(tuning.catchRadius, 0.5),  // catch threshold from tuning
     );
+    this._musicLayer = musicLayer ?? null;
   }
 
   /** Move the dog to a specific spawn position */
@@ -103,6 +113,9 @@ export class MonsterChaseDirector implements IGameEntity {
     this.closeWarning = alert.close;
     this.dog.setCloseWarning(alert.close);
 
+    // Update music layer crossfade based on dog gap
+    this._musicLayer?.update(ctx.clock.delta, alert.gap, this.caught, this.complete);
+
     // Check catch condition
     if (alert.caught && this.chaseActive) {
       this.caught = true;
@@ -112,6 +125,7 @@ export class MonsterChaseDirector implements IGameEntity {
   }
 
   dispose(): void {
+    this._musicLayer?.dispose();
     this.dog.dispose();
   }
 }
