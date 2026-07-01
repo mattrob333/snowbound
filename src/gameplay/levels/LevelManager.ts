@@ -11,6 +11,7 @@ import { FallingIceHazard } from '../hazards/FallingIceHazard';
 import { CrackedIceHazard } from '../hazards/CrackedIceHazard';
 import type { Hazard } from '../hazards/Hazard';
 import { MusicLayerManager } from '../../engine/audio/MusicLayerManager';
+import type { VoiceLineService } from '../../engine/audio/VoiceLineService';
 
 function createHazardFromSpawn(spawn: HazardSpawn, _runtime: LevelRuntime): Hazard | null {
   switch (spawn.type) {
@@ -45,6 +46,7 @@ export class LevelManager {
   private _safeZone: SafeZone | null = null;
   private _chaseDirector: MonsterChaseDirector | null = null;
   private _musicLayer: MusicLayerManager | null = null;
+  private _voiceLines: VoiceLineService | null = null;
 
   constructor(physics: PhysicsWorld, renderer: ThreeRenderer | null = null, audioManager: AudioManager | null = null) {
     this.physics = physics;
@@ -84,6 +86,11 @@ export class LevelManager {
     return this._musicLayer;
   }
 
+  /** Set the voice line service for Jim's audio callouts */
+  setVoiceLines(vls: VoiceLineService | null): void {
+    this._voiceLines = vls;
+  }
+
   /** Load a level by ID from the assets/levels/ directory */
   async loadLevel(
     levelId: string,
@@ -113,8 +120,17 @@ export class LevelManager {
           data.helicopterPart.position,
           data.helicopterPart.partId,
         );
+        const partCollectedCallbacks: (() => void)[] = [];
         if (onPartCollect) {
-          pickup.onCollect = onPartCollect;
+          partCollectedCallbacks.push(onPartCollect);
+        }
+        if (this._voiceLines) {
+          partCollectedCallbacks.push(() => this._voiceLines!.playPartCollected());
+        }
+        if (partCollectedCallbacks.length > 0) {
+          pickup.onCollect = () => {
+            for (const cb of partCollectedCallbacks) cb();
+          };
         }
         entityManager.add(pickup);
       }
@@ -127,6 +143,14 @@ export class LevelManager {
         sz.radius,
         sz.requiresPart,
       );
+      // Wire level complete voice line
+      if (this._voiceLines) {
+        const originalOnComplete = this._safeZone.onLevelComplete;
+        this._safeZone.onLevelComplete = () => {
+          originalOnComplete?.();
+          this._voiceLines!.playLevelComplete();
+        };
+      }
       entityManager.add(this._safeZone);
 
       // Create the monster chase director with dog route + tuning
@@ -149,6 +173,14 @@ export class LevelManager {
         this.audioManager ?? undefined,
         this._musicLayer ?? undefined,
       );
+      // Wire caught voice line
+      if (this._voiceLines) {
+        const originalOnCatch = this._chaseDirector.onCatchPlayer;
+        this._chaseDirector.onCatchPlayer = () => {
+          originalOnCatch?.();
+          this._voiceLines!.playCaught();
+        };
+      }
       entityManager.add(this._chaseDirector);
 
       // Create hazard entities from level data
@@ -156,9 +188,10 @@ export class LevelManager {
         const hazard = createHazardFromSpawn(spawn, runtime);
         if (hazard) {
           entityManager.add(hazard);
-          // Wire hazards to close the dog gap on activation
+          // Wire hazards to close the dog gap on activation + play stumble voice line
           const spawnedHazard = hazard;
-          spawnedHazard.onActivate = () => {
+          const hazardActivateCallbacks: (() => void)[] = [];
+          hazardActivateCallbacks.push(() => {
             if (this._chaseDirector && !this._chaseDirector.caught) {
               if ('dogGapPenalty' in spawnedHazard) {
                 const penalty = (spawnedHazard as unknown as { dogGapPenalty: number }).dogGapPenalty;
@@ -167,6 +200,12 @@ export class LevelManager {
                 this._chaseDirector.closeDogGap(0.08);
               }
             }
+          });
+          if (this._voiceLines) {
+            hazardActivateCallbacks.push(() => this._voiceLines!.playStumble());
+          }
+          spawnedHazard.onActivate = () => {
+            for (const cb of hazardActivateCallbacks) cb();
           };
         }
       }

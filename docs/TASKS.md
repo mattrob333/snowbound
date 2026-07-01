@@ -112,5 +112,5 @@
 - [x] Pickup sounds (AudioManager ready, wired into pickup collection — 'pickup', 'helicopter_part', 'powerup', 'powerup_expire', 'upgrade' sounds)
 - [x] Dog positional audio
 - [x] Chase music layers — MusicLayerManager with patrol/chase crossfade based on dog proximity
-- [ ] Jim voice lines
+- [x] Jim voice lines
 - [ ] Dog slip comedy event

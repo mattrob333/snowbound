@@ -6,6 +6,7 @@ import { PLAYER_TUNING } from '../../config/tuning';
 import { SlideController } from './SlideController';
 import { WallRunController } from './WallRunController';
 import type { PhysicsWorld } from '../../engine/physics/PhysicsWorld';
+import type { VoiceLineService } from '../../engine/audio/VoiceLineService';
 
 const SLIDE_COLLIDER_HALF_HEIGHT = 0.15;
 
@@ -24,6 +25,10 @@ export class PlayerController {
   private wallJumpVelocityZ = 0;
   /** Tracks collider state so we don't swap on every frame */
   private slideColliderActive = false;
+  /** Voice line service (optional) — plays Jim's callouts on key actions */
+  private voiceLines: VoiceLineService | null = null;
+  /** Tracks previous sprint state to detect transitions */
+  private wasSprinting = false;
 
   constructor(
     kcc: CharacterKCC,
@@ -49,6 +54,11 @@ export class PlayerController {
     this.physics = p;
   }
 
+  /** Set the optional voice line service for Jim's callouts */
+  setVoiceLines(vls: VoiceLineService | null): void {
+    this.voiceLines = vls;
+  }
+
   update(dt: number, input: InputManager, cameraAzimuth: number): void {
     // Camera-relative movement directions
     this.forward.set(-Math.sin(cameraAzimuth), 0, -Math.cos(cameraAzimuth));
@@ -62,6 +72,12 @@ export class PlayerController {
       (input.isKeyDown(ControlAction.MoveForward) ? 1 : 0) -
       (input.isKeyDown(ControlAction.MoveBackward) ? 1 : 0);
     this._isSprinting = input.isKeyDown(ControlAction.Sprint);
+
+    // Voice line: sprint started (transition from not sprinting to sprinting + moving forward)
+    if (this._isSprinting && !this.wasSprinting && moveZ > 0) {
+      this.voiceLines?.playSprint();
+    }
+    this.wasSprinting = this._isSprinting;
 
     // Build movement direction
     this.moveDir.set(0, 0, 0);
@@ -80,6 +96,7 @@ export class PlayerController {
     // --- Wall-run handling ---
     let wallJumpApplied = false;
     const wantsWallJump = input.isKeyPressed(ControlAction.Jump);
+    const wasWallRunning = this.wallRunController?.isWallRunning() ?? false;
     if (this.wallRunController && this.physics) {
       this.wallRunController.update(dt, this.kcc, this.physics, wantsWallJump);
 
@@ -93,12 +110,18 @@ export class PlayerController {
         wallJumpApplied = true;
       }
     }
+    // Voice line: wall-run started
+    const isWallRunning = this.wallRunController?.isWallRunning() ?? false;
+    if (isWallRunning && !wasWallRunning) {
+      this.voiceLines?.playWallRun();
+    }
 
     // --- Slide handling ---
     if (this.slideController) {
       // Press slide while grounded and moving
       if (input.isKeyPressed(ControlAction.Slide) && isGrounded && hasMoveInput) {
         this.slideController.start(this.kcc);
+        this.voiceLines?.playSlide();
         if (!this.slideColliderActive) {
           this.kcc.setColliderHalfHeight(SLIDE_COLLIDER_HALF_HEIGHT);
           this.slideColliderActive = true;
@@ -121,6 +144,7 @@ export class PlayerController {
     if (!wallJumpApplied && input.isKeyPressed(ControlAction.Jump) && isGrounded) {
       this.velocityY = PLAYER_TUNING.jumpVelocity;
       this._isJumping = true;
+      this.voiceLines?.playJump();
     }
 
     // --- Gravity ---
