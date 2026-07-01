@@ -14,6 +14,11 @@ export interface SoundHandle {
   setLoop(loop: boolean): void;
 }
 
+/** A handle to a spatial (3D-positioned) sound returned by playSpatial() */
+export interface SpatialSoundHandle extends SoundHandle {
+  setPosition(x: number, y: number, z: number): void;
+}
+
 export type AudioClipType = 'sfx' | 'music';
 
 export class AudioManager {
@@ -226,6 +231,117 @@ export class AudioManager {
   /** Number of currently active (playing) sounds */
   get activeCount(): number {
     return this.activeNodes.size;
+  }
+
+  // ─── Spatial audio ──────────────────────────────────────
+
+  /**
+   * Play a 3D-positioned audio file with distance-based volume.
+   * In mock mode, returns a no-op spatial handle that tracks position
+   * so game code can call setPosition() without null-checks.
+   *
+   * In live mode, uses a PannerNode for Web Audio spatialisation.
+   * The sound will pan/attenuate based on the listener position.
+   */
+  playSpatial(
+    key: string,
+    type: AudioClipType = 'sfx',
+    loop = false,
+    position?: { x: number; y: number; z: number },
+  ): SpatialSoundHandle {
+    const id = `spatial_${this.nextId++}_${key}`;
+    const pos = position ?? { x: 0, y: 0, z: 0 };
+    let _posX = pos.x;
+    let _posY = pos.y;
+    let _posZ = pos.z;
+
+    // Mock mode: return a no-op spatial handle
+    if (this.mockMode) {
+      const active = {
+        stop: () => {
+          this.activeNodes.delete(id);
+        },
+        node: undefined,
+      };
+      this.activeNodes.set(id, active);
+      return {
+        id,
+        stop: () => active.stop(),
+        setVolume: () => {},
+        setLoop: () => {},
+        setPosition: (x: number, y: number, z: number) => {
+          _posX = x;
+          _posY = y;
+          _posZ = z;
+        },
+      };
+    }
+
+    // Live mode
+    if (!this.audioContext) {
+      throw new Error('AudioManager not initialised');
+    }
+
+    const buffer = this.files.get(key);
+    if (!buffer) {
+      // Fallback to silent handle if file not loaded
+      const active = { stop: () => this.activeNodes.delete(id), node: undefined };
+      this.activeNodes.set(id, active);
+      return {
+        id,
+        stop: () => active.stop(),
+        setVolume: () => {},
+        setLoop: () => {},
+        setPosition: () => {},
+      };
+    }
+
+    const source = this.audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.loop = loop;
+
+    const effectiveVol = this.getEffectiveVolume(type);
+    const gain = this.audioContext.createGain();
+    gain.gain.value = effectiveVol;
+
+    const panner = this.audioContext.createPanner();
+    panner.panningModel = 'HRTF';
+    panner.distanceModel = 'inverse';
+    panner.refDistance = 5;
+    panner.maxDistance = 50;
+    panner.rolloffFactor = 1;
+    panner.setPosition(_posX, _posY, _posZ);
+
+    source.connect(panner);
+    panner.connect(gain);
+    gain.connect(this.audioContext.destination);
+    source.start(0);
+
+    const active: { stop: () => void; node?: AudioScheduledSourceNode } = {
+      stop: () => {
+        try { source.stop(); } catch { /* already stopped */ }
+        this.activeNodes.delete(id);
+      },
+      node: source,
+    };
+    this.activeNodes.set(id, active);
+
+    return {
+      id,
+      stop: () => active.stop(),
+      setVolume: (v: number) => {
+        gain.gain.value = v * this.getEffectiveVolume(type);
+      },
+      setLoop: (l: boolean) => {
+        source.loop = l;
+      },
+      setPosition: (x: number, y: number, z: number) => {
+        _posX = x;
+        _posY = y;
+        _posZ = z;
+        panner.setPosition(x, y, z);
+      },
+    };
   }
 
   // ─── Cleanup ────────────────────────────────────────────

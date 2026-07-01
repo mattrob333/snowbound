@@ -5,6 +5,7 @@ import { RoutePath } from '../levels/RoutePath';
 import { MonsterDog } from './MonsterDog';
 import { MonsterDistanceModel } from './MonsterDistanceModel';
 import type { DogTuning, DogWaypoint, Vec3 } from '../levels/LevelData';
+import type { AudioManager } from '../../engine/audio/AudioManager';
 
 /**
  * MonsterChaseDirector — coordinates the dog chase lifecycle for a level.
@@ -41,9 +42,10 @@ export class MonsterChaseDirector implements IGameEntity {
     waypoints: DogWaypoint[],
     tuning: DogTuning,
     scene: THREE.Scene | null = null,
+    audioManager?: AudioManager,
   ) {
     this.routePath = new RoutePath(waypoints);
-    this.dog = new MonsterDog(this.routePath, tuning, scene ? { scene } : null);
+    this.dog = new MonsterDog(this.routePath, tuning, scene ? { scene } : null, audioManager);
     this.distanceModel = new MonsterDistanceModel(
       8,  // close threshold — 8 units
       Math.max(tuning.catchRadius, 0.5),  // catch threshold from tuning

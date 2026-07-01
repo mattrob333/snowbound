@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { RoutePath } from '../gameplay/levels/RoutePath';
 import { MonsterDog, DogState } from '../gameplay/monster/MonsterDog';
 import { DogAnimationState } from '../gameplay/monster/MonsterAnimationController';
+import { AudioManager } from '../engine/audio/AudioManager';
 import type { DogTuning } from '../gameplay/levels/LevelData';
 
 describe('MonsterDog', () => {
@@ -192,5 +193,53 @@ describe('MonsterDog', () => {
     dog.state = DogState.Patrol;
     expect(dog.animation.transitionProgress).toBe(0);
     dog.dispose();
+  });
+
+  // ─── Spatial audio tests ──────────────────────────────
+
+  it('should start spatial audio when audioManager provided', () => {
+    const audio = new AudioManager();
+    audio.init();
+    const dog = new MonsterDog(routePath, tuning, null, audio);
+    expect(dog.audioHandle).not.toBeNull();
+    expect(dog.audioHandle!.id).toContain('dog_growl');
+    dog.dispose();
+  });
+
+  it('should have null audioHandle when no audioManager provided', () => {
+    const dog = new MonsterDog(routePath, tuning, null);
+    expect(dog.audioHandle).toBeNull();
+    dog.dispose();
+  });
+
+  it('should update spatial sound position on movement', () => {
+    const audio = new AudioManager();
+    audio.init();
+    const dog = new MonsterDog(routePath, tuning, null, audio);
+    const spyPositions: Array<{ x: number; y: number; z: number }> = [];
+    const originalSetPosition = dog.audioHandle!.setPosition;
+    dog.audioHandle!.setPosition = (x: number, y: number, z: number) => {
+      spyPositions.push({ x, y, z });
+      originalSetPosition(x, y, z);
+    };
+
+    // Move dog
+    dog.setProgress(0.5);
+    dog.updateSpatialAudio();
+
+    expect(spyPositions.length).toBeGreaterThan(0);
+    const lastPos = spyPositions[spyPositions.length - 1];
+    expect(lastPos.x).toBeCloseTo(50);
+    expect(lastPos.z).toBeCloseTo(0);
+    dog.dispose();
+  });
+
+  it('should stop spatial sound on dispose', () => {
+    const audio = new AudioManager();
+    audio.init();
+    const dog = new MonsterDog(routePath, tuning, null, audio);
+    expect(audio.activeCount).toBe(1);
+    dog.dispose();
+    expect(audio.activeCount).toBe(0);
   });
 });

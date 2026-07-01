@@ -148,4 +148,37 @@ describe('AudioManager', () => {
     audio.dispose();
     expect(audio.isMock).toBe(false);
   });
+
+  // ─── Spatial audio ──────────────────────────────────────
+
+  it('should return a spatial handle from playSpatial in mock mode', () => {
+    audio.init();
+    const handle = audio.playSpatial('dog_growl', 'sfx', true);
+    expect(handle).toBeDefined();
+    expect(handle.id).toContain('dog_growl');
+    expect(audio.activeCount).toBe(1);
+    // Should support setPosition
+    expect(typeof handle.setPosition).toBe('function');
+    // Should not throw
+    handle.setPosition(10, 0, 20);
+    handle.setVolume(0.5);
+    handle.setLoop(true);
+    expect(audio.activeCount).toBe(1);
+  });
+
+  it('should stop a spatial sound via handle.stop()', () => {
+    audio.init();
+    const handle = audio.playSpatial('dog_growl', 'sfx', true);
+    expect(audio.activeCount).toBe(1);
+    handle.stop();
+    expect(audio.activeCount).toBe(0);
+  });
+
+  it('should start spatial sound at a given initial position', () => {
+    audio.init();
+    const handle = audio.playSpatial('dog_growl', 'sfx', true, { x: 100, y: 5, z: 200 });
+    expect(handle).toBeDefined();
+    expect(audio.activeCount).toBe(1);
+    handle.stop();
+  });
 });

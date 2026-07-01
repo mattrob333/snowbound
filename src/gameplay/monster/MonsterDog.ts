@@ -4,6 +4,7 @@ import type { IGameEntity } from '../entities/EntityManager';
 import { RoutePath } from '../levels/RoutePath';
 import { DOG_HEIGHT, DOG_WIDTH } from '../../config/constants';
 import type { DogTuning } from '../levels/LevelData';
+import type { AudioManager, SpatialSoundHandle } from '../../engine/audio/AudioManager';
 import {
   MonsterAnimationController,
   DogAnimationState,
@@ -42,11 +43,14 @@ export class MonsterDog implements IGameEntity {
   private _state: DogState = 'patrol';
   /** Store reference to scene for cleanup */
   private renderer: { scene: THREE.Scene } | null = null;
+  /** Spatial audio handle for dog growl (null if audio not started) */
+  audioHandle: SpatialSoundHandle | null = null;
 
   constructor(
     routePath: RoutePath,
     tuning: DogTuning,
     renderer: { scene: THREE.Scene } | null = null,
+    audioManager?: AudioManager,
   ) {
     this.routePath = routePath;
     this.tuning = tuning;
@@ -74,6 +78,12 @@ export class MonsterDog implements IGameEntity {
     if (renderer) {
       renderer.scene.add(this.mesh);
       this.renderer = renderer;
+    }
+
+    // Start spatial audio for the dog's growl if audio manager available
+    if (audioManager) {
+      const pos = this.getPosition();
+      this.audioHandle = audioManager.playSpatial('dog_growl', 'sfx', true, pos);
     }
   }
 
@@ -112,6 +122,17 @@ export class MonsterDog implements IGameEntity {
     // Apply current scale from animation state
     const scale = this.animation.currentScale;
     this.mesh.scale.set(scale, scale, scale);
+  }
+
+  /**
+   * Update the spatial audio position to match the dog's current mesh position.
+   * Call this after any movement to keep the growl sound in sync.
+   */
+  updateSpatialAudio(): void {
+    if (this.audioHandle) {
+      const pos = this.getPosition();
+      this.audioHandle.setPosition(pos.x, pos.y, pos.z);
+    }
   }
 
   /**
@@ -161,6 +182,11 @@ export class MonsterDog implements IGameEntity {
     const pos = this.routePath.getPositionAtProgress(this.progress);
     this.mesh.position.set(pos.x, pos.y, pos.z);
 
+    // Sync spatial audio position
+    if (this.audioHandle) {
+      this.audioHandle.setPosition(pos.x, pos.y, pos.z);
+    }
+
     // Orient the dog the way it's facing (along the route)
     const next = this.routePath.getPositionAtProgress(Math.min(1, this.progress + 0.01));
     const dx = next.x - pos.x;
@@ -183,6 +209,11 @@ export class MonsterDog implements IGameEntity {
   }
 
   dispose(): void {
+    // Stop spatial audio
+    if (this.audioHandle) {
+      this.audioHandle.stop();
+      this.audioHandle = null;
+    }
     if (this.renderer) {
       this.renderer.scene.remove(this.mesh);
     }

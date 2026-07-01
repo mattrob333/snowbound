@@ -2,6 +2,7 @@ import { LevelLoader, type LevelRuntime } from './LevelLoader';
 import type { LevelData, HazardSpawn } from './LevelData';
 import type { PhysicsWorld } from '../../engine/physics/PhysicsWorld';
 import type { ThreeRenderer } from '../../engine/rendering/ThreeRenderer';
+import type { AudioManager } from '../../engine/audio/AudioManager';
 import type { EntityManager } from '../entities/EntityManager';
 import { HelicopterPartPickup } from '../pickups/HelicopterPartPickup';
 import { SafeZone } from './SafeZone';
@@ -36,15 +37,17 @@ export class LevelManager {
   private loader: LevelLoader;
   private physics: PhysicsWorld;
   private renderer: ThreeRenderer | null;
+  private audioManager: AudioManager | null;
   private currentLevelId: string | null = null;
   private currentRuntime: LevelRuntime | null = null;
   private currentData: LevelData | null = null;
   private _safeZone: SafeZone | null = null;
   private _chaseDirector: MonsterChaseDirector | null = null;
 
-  constructor(physics: PhysicsWorld, renderer: ThreeRenderer | null = null) {
+  constructor(physics: PhysicsWorld, renderer: ThreeRenderer | null = null, audioManager: AudioManager | null = null) {
     this.physics = physics;
     this.renderer = renderer;
+    this.audioManager = audioManager;
     this.loader = new LevelLoader(physics, renderer);
   }
 
@@ -125,6 +128,7 @@ export class LevelManager {
         data.dogRoute,
         data.dogTuning,
         scene,
+        this.audioManager ?? undefined,
       );
       entityManager.add(this._chaseDirector);
 

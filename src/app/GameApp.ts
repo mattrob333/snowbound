@@ -97,7 +97,7 @@ export class GameApp {
     const entityManager = new EntityManager();
     const assets = new AssetManager();
     const audio = new AudioManager();
-    const levelManager = new LevelManager(physics, renderer);
+    const levelManager = new LevelManager(physics, renderer, audio);
 
     this.ctx = {
       renderer,
