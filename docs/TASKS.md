@@ -109,7 +109,7 @@
 - [x] Dog animation controller — MonsterAnimationController state machine, 17 tests
 - [x] Jim placeholder animations
 - [x] Dog placeholder animations (wired from MonsterAnimationController)
-- [ ] Pickup sounds (AudioManager ready, needs wiring into game loop)
+- [x] Pickup sounds (AudioManager ready, wired into pickup collection — 'pickup', 'helicopter_part', 'powerup', 'powerup_expire', 'upgrade' sounds)
 - [ ] Dog positional audio
 - [ ] Chase music layers
 - [ ] Jim voice lines

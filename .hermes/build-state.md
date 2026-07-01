@@ -3,7 +3,7 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** Phase 11 in progress — 4 of 10 Phase 11 slices complete. 251 tests green.
+**Status:** Phase 11 in progress — 7 of 10 Phase 11 slices complete. 275 tests green.
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 3m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
@@ -21,7 +21,7 @@
 9. [x] Phase 8 — Hazard system
 10. [x] Phase 9 — Save and progression
 11. [x] Phase 10 — Build all 15 levels
-12. [ ] Phase 11 — Audio, animation, polish (6/10 tasks done — 273 tests)
+12. [ ] Phase 11 — Audio, animation, polish (7/10 tasks done — 275 tests)
 
 ## Completed Tasks
 *(Previous phases unchanged — see git log)*
@@ -32,12 +32,13 @@
 - **Phase 11 slice 4:** MonsterAnimationController (17 tests). Dog animation state machine: Patrol/Chase/Catch with smooth scale interpolation, configurable animation names, close warning.
 - **Phase 11 slice 5:** JimAnimationController (12 tests). Player animation state machine mapping PlayerMovementState → JimAnimState with crossfade progress, blend weight, previous/current animation names, configurable transition duration and animation name overrides.
 - **Phase 11 slice 6:** Dog animation wiring (10 integration tests). MonsterAnimationController now wired into MonsterDog via state setter. MonsterChaseDirector calls updateAnimation() each frame and propagates closeWarning to animation controller. Dog mesh scale now driven by animation state. 273 tests total.
+- **Phase 11 slice 7:** Pickup sounds wiring (2 new tests). Base Pickup: configurable soundKey property (default 'pickup'). HelicopterPartPickup: 'helicopter_part' sound. PowerupPickup: 'powerup' + 'powerup_expire' on deactivation. UpgradePickup: 'upgrade' sound. Fixed pre-existing Pickup.test.ts bug where 'far away' test had player at same position as pickup. 275 tests.
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 11 slice 7: Pickup sounds wiring (AudioManager ready, wire into game loop when pickups are collected).
+- Phase 11 slice 8: Dog positional audio (AudioManager ready, wire spatial audio for MonsterDog with distance-based volume and player position tracking).
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
@@ -56,4 +57,4 @@ _(none yet)_
 - VictorySequence is pure logic, no DOM — testable in Node without jsdom.
 - MonsterAnimationController is pure logic, no DOM — testable in Node without jsdom.
 
-**Last Updated:** 2026-07-01 — Phase 11 at 6/10 slices (273 tests)
+**Last Updated:** 2026-07-01 — Phase 11 at 7/10 slices (275 tests)
