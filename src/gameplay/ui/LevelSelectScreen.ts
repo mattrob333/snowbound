@@ -162,7 +162,6 @@ export class LevelSelectScreen {
       background: rgba(255,255,255,0.05);
       color: #ccc;
       transition: all 0.2s ease;
-      display: none;
     `;
     backBtn.id = 'snowbound-back-btn';
     backBtn.onclick = () => this.onBackToTitle();

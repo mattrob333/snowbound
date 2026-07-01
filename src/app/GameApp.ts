@@ -15,6 +15,8 @@ import { PlayerUpgradeService } from '../gameplay/player/PlayerUpgradeService';
 import { ThirdPersonCameraRig } from '../engine/camera/ThirdPersonCameraRig';
 import { Hud } from '../gameplay/ui/Hud';
 import { LevelSelectScreen } from '../gameplay/ui/LevelSelectScreen';
+import { GameOverScreen } from '../gameplay/ui/GameOverScreen';
+import { TitleScreen } from '../gameplay/ui/TitleScreen';
 import { CAMERA_DISTANCE } from '../config/constants';
 import type { GameContext } from './GameContext';
 
@@ -24,6 +26,8 @@ export class GameApp {
   private loop = new GameLoop();
   private hud = new Hud();
   private levelSelectScreen: LevelSelectScreen | null = null;
+  private gameOverScreen: GameOverScreen | null = null;
+  private titleScreen: TitleScreen | null = null;
   private saveService: SaveService;
   private playerUpgradeService: PlayerUpgradeService;
 
@@ -42,14 +46,34 @@ export class GameApp {
     this.hud.attach(container);
     this.hud.hide(); // Hidden until a level is active
 
-    // Level select screen
+    // Level select screen (hidden until title screen play)
     this.levelSelectScreen = new LevelSelectScreen(
       this.saveService,
       (levelId) => this.startLevel(levelId),
-      () => this.showLevelSelect(),
+      () => this.showTitle(),
     );
     this.levelSelectScreen.attach(container);
-    this.levelSelectScreen.show();
+    this.levelSelectScreen.hide();
+
+    // Game over screen (hidden until caught)
+    this.gameOverScreen = new GameOverScreen();
+    this.gameOverScreen.attach(container);
+    this.gameOverScreen.onRestart = () => {
+      const currentId = this.ctx.levelManager.currentId;
+      if (currentId) {
+        this.gameOverScreen?.hide();
+        this.startLevel(currentId);
+      }
+    };
+
+    // Title screen (shown first — press Enter to play)
+    this.titleScreen = new TitleScreen();
+    this.titleScreen.attach(container);
+    this.titleScreen.onPlay = () => {
+      this.titleScreen?.hide();
+      this.showLevelSelect();
+    };
+    this.titleScreen.show();
 
     // Attach input
     const input = new InputManager();
@@ -153,7 +177,7 @@ export class GameApp {
 
     if (ctx.levelManager.chaseDirector) {
       ctx.levelManager.chaseDirector.onCatchPlayer = () => {
-        console.log('[Snowbound] Player was caught by the dog.');
+        this.gameOverScreen?.show();
       };
     }
 
@@ -192,5 +216,14 @@ export class GameApp {
   private showLevelSelect(): void {
     this.hud.hide();
     this.levelSelectScreen?.show();
+  }
+
+  /**
+   * Go back to the title screen from the level select.
+   */
+  private showTitle(): void {
+    this.hud.hide();
+    this.levelSelectScreen?.hide();
+    this.titleScreen?.show();
   }
 }

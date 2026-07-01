@@ -131,8 +131,8 @@
 - [ ] Dog slip comedy event (optional bonus polish)
 
 ## Phase 12: Polish & Overnight Fixes
-- [ ] Dog slip comedy event — dog slips on ice-tagged surfaces with random chance, plays slip animation, falls behind by slipGapBonus distance, Jim gets a voice line
-- [ ] Caught/game-over flow — when dog catches player, show game over screen with restart option (not just a console.log)
+- [x] Dog slip comedy event — dog slips on ice-tagged surfaces with random chance, plays slip animation, falls behind by slipGapBonus distance, Jim gets a voice line
+- [x] Caught/game-over flow — when dog catches player, show game over screen with restart option (not just a console.log)
 - [ ] Title screen — boot into a "Press Enter to Play" title with the game name instead of a raw level select
 - [ ] Better placeholder visuals — color-coded primitives for pickups (gold for parts, blue for power-ups, green for upgrades), colored dog mesh, environment variety
 - [ ] Level data balance pass — verify all 15 level JSONs have reachable part positions, valid spawns, and sensible route paths
