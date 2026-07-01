@@ -88,6 +88,9 @@ export class MonsterChaseDirector implements IGameEntity {
     // Move dog towards player
     this.dog.moveTowardsPlayer(this.playerProgress, ctx.clock.delta);
 
+    // Advance dog animation controller
+    this.dog.updateAnimation(ctx.clock.delta);
+
     // Evaluate gap
     const alert = this.distanceModel.evaluate(
       this.dog.progress,
@@ -96,6 +99,7 @@ export class MonsterChaseDirector implements IGameEntity {
     );
 
     this.closeWarning = alert.close;
+    this.dog.setCloseWarning(alert.close);
 
     // Check catch condition
     if (alert.caught && this.chaseActive) {

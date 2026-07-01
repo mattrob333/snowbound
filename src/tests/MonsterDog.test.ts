@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { RoutePath } from '../gameplay/levels/RoutePath';
 import { MonsterDog, DogState } from '../gameplay/monster/MonsterDog';
+import { DogAnimationState } from '../gameplay/monster/MonsterAnimationController';
 import type { DogTuning } from '../gameplay/levels/LevelData';
 
 describe('MonsterDog', () => {
@@ -128,5 +129,68 @@ describe('MonsterDog', () => {
   it('should dispose without error', () => {
     const dog = new MonsterDog(routePath, tuning, null);
     expect(() => dog.dispose()).not.toThrow();
+  });
+
+  // ─── Animation integration tests ─────────────────────
+
+  it('should start with Patrol animation state', () => {
+    const dog = new MonsterDog(routePath, tuning, null);
+    expect(dog.animation.state).toBe(DogAnimationState.Patrol);
+    dog.dispose();
+  });
+
+  it('should transition animation when state setter is used', () => {
+    const dog = new MonsterDog(routePath, tuning, null);
+    dog.state = DogState.Chase;
+    expect(dog.state).toBe(DogState.Chase);
+    expect(dog.animation.state).toBe(DogAnimationState.Chase);
+    dog.dispose();
+  });
+
+  it('should transition animation to Catch when caught', () => {
+    const dog = new MonsterDog(routePath, tuning, null);
+    dog.state = DogState.Caught;
+    expect(dog.state).toBe(DogState.Caught);
+    expect(dog.animation.state).toBe(DogAnimationState.Catch);
+    dog.dispose();
+  });
+
+  it('should apply scale via updateAnimation', () => {
+    const dog = new MonsterDog(routePath, tuning, null);
+    dog.state = DogState.Chase;
+    // Initial scale is 1 (patrol scale)
+    expect(dog.mesh.scale.x).toBe(1);
+    expect(dog.mesh.scale.y).toBe(1);
+    expect(dog.mesh.scale.z).toBe(1);
+
+    // Advance animation
+    dog.updateAnimation(0.5); // 0.5s with default 0.3s duration
+
+    // Scale should have increased but not yet at max (1.2)
+    expect(dog.mesh.scale.x).toBeGreaterThan(1.0);
+    expect(dog.mesh.scale.x).toBeLessThanOrEqual(1.2);
+    dog.dispose();
+  });
+
+  it('should propagate close warning to animation controller', () => {
+    const dog = new MonsterDog(routePath, tuning, null);
+    expect(dog.animation.closeWarning).toBe(false);
+
+    dog.setCloseWarning(true);
+    expect(dog.animation.closeWarning).toBe(true);
+
+    dog.setCloseWarning(false);
+    expect(dog.animation.closeWarning).toBe(false);
+    dog.dispose();
+  });
+
+  it('should trigger animation transition only when state changes', () => {
+    const dog = new MonsterDog(routePath, tuning, null);
+    expect(dog.animation.transitionProgress).toBe(0);
+
+    // Set to same state — should not reset progress or retrigger
+    dog.state = DogState.Patrol;
+    expect(dog.animation.transitionProgress).toBe(0);
+    dog.dispose();
   });
 });

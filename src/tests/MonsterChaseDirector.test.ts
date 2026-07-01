@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { MonsterChaseDirector } from '../gameplay/monster/MonsterChaseDirector';
 import { RoutePath } from '../gameplay/levels/RoutePath';
+import { DogAnimationState } from '../gameplay/monster/MonsterAnimationController';
 import type { DogTuning, DogWaypoint } from '../gameplay/levels/LevelData';
 
 describe('MonsterChaseDirector', () => {
@@ -163,5 +164,66 @@ describe('MonsterChaseDirector', () => {
   it('should clean up on dispose', () => {
     const director = new MonsterChaseDirector(waypoints, tuning, null);
     expect(() => director.dispose()).not.toThrow();
+  });
+
+  // ─── Animation integration tests ─────────────────────
+
+  it('should set dog animation to Chase when chase starts', () => {
+    const director = new MonsterChaseDirector(waypoints, tuning, null);
+    expect(director.dog.animation.state).toBe(DogAnimationState.Patrol);
+
+    director.update(1 / 60, makeMockCtx(50, true));
+    expect(director.dog.animation.state).toBe(DogAnimationState.Chase);
+    director.dispose();
+  });
+
+  it('should set dog animation to Catch when player is caught', () => {
+    const director = new MonsterChaseDirector(waypoints, tuning, null);
+    director.update(1 / 60, makeMockCtx(50, true));
+
+    // Teleport dog to player position to trigger catch
+    director.dog.setProgress(0.5);
+    director.playerProgress = 0.5;
+    director.update(1 / 60, makeMockCtx(50, true));
+
+    expect(director.caught).toBe(true);
+    expect(director.dog.animation.state).toBe(DogAnimationState.Catch);
+    director.dispose();
+  });
+
+  it('should propagate close warning to dog animation', () => {
+    const director = new MonsterChaseDirector(waypoints, tuning, null);
+    director.update(1 / 60, makeMockCtx(50, true));
+
+    // Place dog very close but not caught
+    director.dog.setProgress(0.48);
+    director.playerProgress = 0.5;
+    director.update(1 / 60, makeMockCtx(50, true));
+
+    expect(director.closeWarning).toBe(true);
+    expect(director.dog.animation.closeWarning).toBe(true);
+    director.dispose();
+  });
+
+  it('should advance dog animation progress over time', () => {
+    const director = new MonsterChaseDirector(waypoints, tuning, null);
+    // Before chase — animation is at Patrol, progress at 0
+    expect(director.dog.animation.state).toBe(DogAnimationState.Patrol);
+    expect(director.dog.animation.currentScale).toBe(1.0);
+
+    // Trigger chase — sets animation to Chase and resets progress to 0
+    director.update(1 / 60, makeMockCtx(50, true));
+    expect(director.dog.animation.state).toBe(DogAnimationState.Chase);
+
+    // After some time, scale should approach chase scale (1.2)
+    const steps = 30; // 30 frames at 60fps = 0.5s
+    for (let i = 0; i < steps; i++) {
+      director.update(1 / 60, makeMockCtx(50, true));
+    }
+
+    const animScale = director.dog.animation.currentScale;
+    expect(animScale).toBeGreaterThan(1.0);
+    expect(animScale).toBeLessThanOrEqual(1.2);
+    director.dispose();
   });
 });

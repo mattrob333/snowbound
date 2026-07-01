@@ -4,6 +4,10 @@ import type { IGameEntity } from '../entities/EntityManager';
 import { RoutePath } from '../levels/RoutePath';
 import { DOG_HEIGHT, DOG_WIDTH } from '../../config/constants';
 import type { DogTuning } from '../levels/LevelData';
+import {
+  MonsterAnimationController,
+  DogAnimationState,
+} from './MonsterAnimationController';
 
 export const DogState = {
   Patrol: 'patrol',
@@ -11,6 +15,15 @@ export const DogState = {
   Caught: 'caught',
 } as const;
 export type DogState = (typeof DogState)[keyof typeof DogState];
+
+/** Maps game DogState to DogAnimationState */
+function dogStateToAnim(state: DogState): DogAnimationState {
+  switch (state) {
+    case DogState.Patrol: return DogAnimationState.Patrol;
+    case DogState.Chase: return DogAnimationState.Chase;
+    case DogState.Caught: return DogAnimationState.Catch;
+  }
+}
 
 /**
  * MonsterDog — a placeholder dog entity that moves along a route path.
@@ -20,12 +33,13 @@ export type DogState = (typeof DogState)[keyof typeof DogState];
 export class MonsterDog implements IGameEntity {
   readonly mesh: THREE.Mesh;
   readonly routePath: RoutePath;
+  readonly animation: MonsterAnimationController;
   tuning: DogTuning;
 
   /** Normalised progress along the route (0..1) */
   progress: number = 0;
   /** Current state of the dog */
-  state: DogState = 'patrol';
+  private _state: DogState = 'patrol';
   /** Store reference to scene for cleanup */
   private renderer: { scene: THREE.Scene } | null = null;
 
@@ -36,6 +50,7 @@ export class MonsterDog implements IGameEntity {
   ) {
     this.routePath = routePath;
     this.tuning = tuning;
+    this.animation = new MonsterAnimationController();
 
     // Create the visual mesh — a tall brown capsule placeholder
     const capsuleGeo = new THREE.CapsuleGeometry(
@@ -62,6 +77,18 @@ export class MonsterDog implements IGameEntity {
     }
   }
 
+  /** Dog's movement state — setting this also updates the animation controller */
+  get state(): DogState {
+    return this._state;
+  }
+
+  set state(value: DogState) {
+    if (value !== this._state) {
+      this._state = value;
+      this.animation.transitionTo(dogStateToAnim(value));
+    }
+  }
+
   /**
    * Get the current world position of the dog.
    */
@@ -74,7 +101,24 @@ export class MonsterDog implements IGameEntity {
    * Get the current speed based on state.
    */
   getCurrentSpeed(): number {
-    return this.state === 'chase' ? this.tuning.chaseSpeed : this.tuning.patrolSpeed;
+    return this._state === 'chase' ? this.tuning.chaseSpeed : this.tuning.patrolSpeed;
+  }
+
+  /**
+   * Advance the animation controller by dt seconds and sync visuals.
+   */
+  updateAnimation(dt: number): void {
+    this.animation.update(dt);
+    // Apply current scale from animation state
+    const scale = this.animation.currentScale;
+    this.mesh.scale.set(scale, scale, scale);
+  }
+
+  /**
+   * Set close warning state on the animation controller.
+   */
+  setCloseWarning(active: boolean): void {
+    this.animation.setCloseWarning(active);
   }
 
   /**
@@ -84,13 +128,13 @@ export class MonsterDog implements IGameEntity {
    * @param dt  Delta time (fixed physics step)
    */
   moveTowardsPlayer(targetProgress: number, dt: number): void {
-    if (this.state === 'caught') return;
+    if (this._state === 'caught') return;
 
     // Determine target progress for the dog
     let target: number;
     const patrolOffset = this.tuning.patrolDistance / this.routePath.totalLength;
 
-    if (this.state === 'chase') {
+    if (this._state === 'chase') {
       // Chase: aim for the player's position
       target = targetProgress;
     } else {
