@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { LevelLoader, type LevelRuntime } from './LevelLoader';
-import type { LevelData, HazardSpawn } from './LevelData';
+import type { LevelData, HazardSpawn, AABB } from './LevelData';
 import type { PhysicsWorld } from '../../engine/physics/PhysicsWorld';
 import type { ThreeRenderer } from '../../engine/rendering/ThreeRenderer';
 import type { AudioManager } from '../../engine/audio/AudioManager';
@@ -34,6 +34,30 @@ function createHazardFromSpawn(spawn: HazardSpawn, _runtime: LevelRuntime): Haza
       // Other hazard types not yet implemented
       return null;
   }
+}
+
+/** Convert a position + halfExtents (centre and size) to an AABB (min/max) */
+function halfExtentsToAABB(pos: { x: number; y: number; z: number }, half: { x: number; y: number; z: number }): AABB {
+  return {
+    min: { x: pos.x - half.x, y: pos.y - half.y, z: pos.z - half.z },
+    max: { x: pos.x + half.x, y: pos.y + half.y, z: pos.z + half.z },
+  };
+}
+
+/** Collect ice zones from level data hazards and obstacles */
+function collectIceZones(data: LevelData): AABB[] {
+  const zones: AABB[] = [];
+  for (const hazard of data.hazards) {
+    if (hazard.type === 'cracked_ice' || hazard.type === 'sliding_ice') {
+      zones.push(halfExtentsToAABB(hazard.position, hazard.halfExtents));
+    }
+  }
+  for (const obstacle of data.obstacles) {
+    if (obstacle.type === 'cracked_ice') {
+      zones.push(halfExtentsToAABB(obstacle.position, obstacle.halfExtents));
+    }
+  }
+  return zones;
 }
 
 export class LevelManager {
@@ -175,6 +199,7 @@ export class LevelManager {
         scene,
         this.audioManager ?? undefined,
         this._musicLayer ?? undefined,
+        collectIceZones(data),
       );
       // Wire caught voice line
       if (this._voiceLines) {

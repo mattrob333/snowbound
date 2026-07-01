@@ -3,6 +3,7 @@ export const DogAnimationState = {
   Patrol: 'Patrol',
   Chase: 'Chase',
   Catch: 'Catch',
+  Slip: 'Slip',
 } as const;
 export type DogAnimationState = (typeof DogAnimationState)[keyof typeof DogAnimationState];
 
@@ -21,12 +22,14 @@ const DEFAULT_STATE_SCALE: Record<DogAnimationState, number> = {
   [DogAnimationState.Patrol]: 1.0,
   [DogAnimationState.Chase]: 1.2,
   [DogAnimationState.Catch]: 1.0,
+  [DogAnimationState.Slip]: 0.9,
 };
 
 const DEFAULT_ANIM_NAMES: Record<DogAnimationState, string> = {
   [DogAnimationState.Patrol]: 'idle',
   [DogAnimationState.Chase]: 'run',
   [DogAnimationState.Catch]: 'catch',
+  [DogAnimationState.Slip]: 'slip',
 };
 
 /**

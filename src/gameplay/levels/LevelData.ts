@@ -108,6 +108,12 @@ export interface DogTuning {
   catchRadius: number;
   /** How far the dog stays behind during patrol */
   patrolDistance: number;
+  /** Chance (0–1) of dog slipping on ice per check (optional, default 0) */
+  slipChance?: number;
+  /** Distance the dog falls behind when slipping (units, default 0) */
+  slipGapBonus?: number;
+  /** Duration of the slip animation in seconds (default 0.5) */
+  slipDuration?: number;
 }
 
 /** Complete level definition — drives LevelLoader */

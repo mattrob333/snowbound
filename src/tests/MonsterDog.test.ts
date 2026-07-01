@@ -3,7 +3,7 @@ import { RoutePath } from '../gameplay/levels/RoutePath';
 import { MonsterDog, DogState } from '../gameplay/monster/MonsterDog';
 import { DogAnimationState } from '../gameplay/monster/MonsterAnimationController';
 import { AudioManager } from '../engine/audio/AudioManager';
-import type { DogTuning } from '../gameplay/levels/LevelData';
+import type { DogTuning, AABB } from '../gameplay/levels/LevelData';
 
 describe('MonsterDog', () => {
   const waypoints = [
@@ -241,5 +241,117 @@ describe('MonsterDog', () => {
     expect(audio.activeCount).toBe(1);
     dog.dispose();
     expect(audio.activeCount).toBe(0);
+  });
+
+  // ─── Ice slip tests ──────────────────────────────────
+
+  it('should not slip when no ice zones are provided', () => {
+    // Dog with no ice zones — even 100% slip chance should not trigger
+    const slipTuning: DogTuning = { ...tuning, slipChance: 1.0, slipGapBonus: 5 };
+    const dog = new MonsterDog(routePath, slipTuning, null);
+    dog.moveTowardsPlayer(0.5, 1);
+    expect(dog.state).toBe(DogState.Patrol);
+    dog.dispose();
+  });
+
+  it('should slip when on ice and slip chance triggers', () => {
+    // Create an ice zone covering the entire route (0,0,0 to 100,1,0)
+    const iceZones: AABB[] = [{
+      min: { x: -10, y: -1, z: -10 },
+      max: { x: 110, y: 1, z: 10 },
+    }];
+    const slipTuning: DogTuning = { ...tuning, slipChance: 1.0, slipGapBonus: 5 };
+    const dog = new MonsterDog(routePath, slipTuning, null, undefined, iceZones);
+    // Dog starts at progress 0
+    dog.moveTowardsPlayer(0.5, 1);
+    // Dog should have slipped — progress reduced by slipGapBonus / routeLength
+    // routePath.totalLength = 100, so slip = 5 / 100 = 0.05
+    // The moveTowardsPlayer should have moved dog forward by a bit first, then slipped backward
+    expect(dog.state).toBe(DogState.Slip);
+    dog.dispose();
+  });
+
+  it('should not slip with 0 percent slip chance even on ice', () => {
+    const iceZones: AABB[] = [{
+      min: { x: -10, y: -1, z: -10 },
+      max: { x: 110, y: 1, z: 10 },
+    }];
+    const slipTuning: DogTuning = { ...tuning, slipChance: 0.0, slipGapBonus: 5 };
+    const dog = new MonsterDog(routePath, slipTuning, null, undefined, iceZones);
+    dog.moveTowardsPlayer(0.5, 1);
+    expect(dog.state).toBe(DogState.Patrol);
+    dog.dispose();
+  });
+
+  it('should not slip when dog is not on ice', () => {
+    // Ice zone far away from dog's position
+    const iceZones: AABB[] = [{
+      min: { x: 999, y: -1, z: 999 },
+      max: { x: 1000, y: 1, z: 1000 },
+    }];
+    const slipTuning: DogTuning = { ...tuning, slipChance: 1.0, slipGapBonus: 5 };
+    const dog = new MonsterDog(routePath, slipTuning, null, undefined, iceZones);
+    dog.moveTowardsPlayer(0.5, 1);
+    expect(dog.state).toBe(DogState.Patrol);
+    dog.dispose();
+  });
+
+  it('should reduce dog progress when slipping', () => {
+    const iceZones: AABB[] = [{
+      min: { x: -10, y: -1, z: -10 },
+      max: { x: 110, y: 1, z: 10 },
+    }];
+    const slipTuning: DogTuning = { ...tuning, slipChance: 1.0, slipGapBonus: 5 };
+    const dog = new MonsterDog(routePath, slipTuning, null, undefined, iceZones);
+    // Set dog to some progress first
+    dog.setProgress(0.5);
+    // dog moves towards patrol target (0.5 - 15/100 = 0.35), then slip reduces by 5/100 = 0.05
+    // After move: progress = 0.47, after slip: 0.42
+    dog.moveTowardsPlayer(0.5, 1);
+    expect(dog.progress).toBeCloseTo(0.42, 2);
+    dog.dispose();
+  });
+
+  it('should transition animation to Slip state when slipping', () => {
+    const iceZones: AABB[] = [{
+      min: { x: -10, y: -1, z: -10 },
+      max: { x: 110, y: 1, z: 10 },
+    }];
+    const slipTuning: DogTuning = { ...tuning, slipChance: 1.0, slipGapBonus: 5 };
+    const dog = new MonsterDog(routePath, slipTuning, null, undefined, iceZones);
+    dog.moveTowardsPlayer(0.5, 1);
+    expect(dog.animation.state).toBe(DogAnimationState.Slip);
+    dog.dispose();
+  });
+
+  it('should revert to previous state after slip duration', () => {
+    const iceZones: AABB[] = [{
+      min: { x: -10, y: -1, z: -10 },
+      max: { x: 110, y: 1, z: 10 },
+    }];
+    const slipTuning: DogTuning = { ...tuning, slipChance: 1.0, slipGapBonus: 5, slipDuration: 0.3 };
+    const dog = new MonsterDog(routePath, slipTuning, null, undefined, iceZones);
+    dog.moveTowardsPlayer(0.5, 1);
+    expect(dog.state).toBe(DogState.Slip);
+
+    // Advance time past slip duration
+    dog.updateAnimation(0.5); // advances animation time
+    dog.moveTowardsPlayer(0.5, 0.5); // should revert on next movement after timer expires
+    expect(dog.state).toBe(DogState.Patrol);
+    dog.dispose();
+  });
+
+  it('should not slip when caught', () => {
+    const iceZones: AABB[] = [{
+      min: { x: -10, y: -1, z: -10 },
+      max: { x: 110, y: 1, z: 10 },
+    }];
+    const slipTuning: DogTuning = { ...tuning, slipChance: 1.0, slipGapBonus: 5 };
+    const dog = new MonsterDog(routePath, slipTuning, null, undefined, iceZones);
+    dog.state = DogState.Caught;
+    dog.moveTowardsPlayer(0.5, 1);
+    expect(dog.state).toBe(DogState.Caught);
+    expect(dog.progress).toBeCloseTo(0);
+    dog.dispose();
   });
 });

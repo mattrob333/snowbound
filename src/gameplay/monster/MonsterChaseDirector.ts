@@ -4,7 +4,7 @@ import type { IGameEntity } from '../entities/EntityManager';
 import { RoutePath } from '../levels/RoutePath';
 import { MonsterDog } from './MonsterDog';
 import { MonsterDistanceModel } from './MonsterDistanceModel';
-import type { DogTuning, DogWaypoint, Vec3 } from '../levels/LevelData';
+import type { DogTuning, DogWaypoint, Vec3, AABB } from '../levels/LevelData';
 import type { AudioManager } from '../../engine/audio/AudioManager';
 import type { MusicLayerManager } from '../../engine/audio/MusicLayerManager';
 
@@ -53,9 +53,10 @@ export class MonsterChaseDirector implements IGameEntity {
     scene: THREE.Scene | null = null,
     audioManager?: AudioManager,
     musicLayer?: MusicLayerManager,
+    iceZones?: AABB[],
   ) {
     this.routePath = new RoutePath(waypoints);
-    this.dog = new MonsterDog(this.routePath, tuning, scene ? { scene } : null, audioManager);
+    this.dog = new MonsterDog(this.routePath, tuning, scene ? { scene } : null, audioManager, iceZones);
     this.distanceModel = new MonsterDistanceModel(
       8,  // close threshold — 8 units
       Math.max(tuning.catchRadius, 0.5),  // catch threshold from tuning

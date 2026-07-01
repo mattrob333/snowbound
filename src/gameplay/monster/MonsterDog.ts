@@ -3,7 +3,7 @@ import type { GameContext } from '../../app/GameContext';
 import type { IGameEntity } from '../entities/EntityManager';
 import { RoutePath } from '../levels/RoutePath';
 import { DOG_HEIGHT, DOG_WIDTH } from '../../config/constants';
-import type { DogTuning } from '../levels/LevelData';
+import type { DogTuning, AABB } from '../levels/LevelData';
 import type { AudioManager, SpatialSoundHandle } from '../../engine/audio/AudioManager';
 import {
   MonsterAnimationController,
@@ -14,6 +14,7 @@ export const DogState = {
   Patrol: 'patrol',
   Chase: 'chase',
   Caught: 'caught',
+  Slip: 'slip',
 } as const;
 export type DogState = (typeof DogState)[keyof typeof DogState];
 
@@ -23,8 +24,12 @@ function dogStateToAnim(state: DogState): DogAnimationState {
     case DogState.Patrol: return DogAnimationState.Patrol;
     case DogState.Chase: return DogAnimationState.Chase;
     case DogState.Caught: return DogAnimationState.Catch;
+    case DogState.Slip: return DogAnimationState.Slip;
   }
 }
+
+/** Default slip duration when not specified in tuning */
+const DEFAULT_SLIP_DURATION = 0.5;
 
 /**
  * MonsterDog — a placeholder dog entity that moves along a route path.
@@ -45,15 +50,25 @@ export class MonsterDog implements IGameEntity {
   private renderer: { scene: THREE.Scene } | null = null;
   /** Spatial audio handle for dog growl (null if audio not started) */
   audioHandle: SpatialSoundHandle | null = null;
+  /** Ice zones to check for dog slip comedy event */
+  private iceZones: AABB[] = [];
+  /** Timer for slip state duration (seconds remaining) */
+  private _slipTimer: number = 0;
+  /** Cooldown after a slip ends before another can trigger */
+  private _slipCooldown: number = 0;
+  /** Previous state before slip triggered (to restore after slip ends) */
+  private _previousState: DogState = 'patrol';
 
   constructor(
     routePath: RoutePath,
     tuning: DogTuning,
     renderer: { scene: THREE.Scene } | null = null,
     audioManager?: AudioManager,
+    iceZones?: AABB[],
   ) {
     this.routePath = routePath;
     this.tuning = tuning;
+    this.iceZones = iceZones ?? [];
     this.animation = new MonsterAnimationController();
 
     // Create the visual mesh — a tall brown capsule placeholder
@@ -111,7 +126,13 @@ export class MonsterDog implements IGameEntity {
    * Get the current speed based on state.
    */
   getCurrentSpeed(): number {
-    return this._state === 'chase' ? this.tuning.chaseSpeed : this.tuning.patrolSpeed;
+    switch (this._state) {
+      case DogState.Chase: return this.tuning.chaseSpeed;
+      case DogState.Slip:
+      case DogState.Patrol:
+      default:
+        return this.tuning.patrolSpeed;
+    }
   }
 
   /**
@@ -119,6 +140,19 @@ export class MonsterDog implements IGameEntity {
    */
   updateAnimation(dt: number): void {
     this.animation.update(dt);
+
+    // Tick down slip timer
+    if (this._state === DogState.Slip) {
+      this._slipTimer -= dt;
+      if (this._slipTimer <= 0) {
+        // Slip ended — restore previous state and set cooldown
+        this.state = this._previousState;
+        this._slipCooldown = 1.0; // 1s cooldown before another slip can trigger
+      }
+    } else if (this._slipCooldown > 0) {
+      this._slipCooldown -= dt;
+    }
+
     // Apply current scale from animation state
     const scale = this.animation.currentScale;
     this.mesh.scale.set(scale, scale, scale);
@@ -126,7 +160,6 @@ export class MonsterDog implements IGameEntity {
 
   /**
    * Update the spatial audio position to match the dog's current mesh position.
-   * Call this after any movement to keep the growl sound in sync.
    */
   updateSpatialAudio(): void {
     if (this.audioHandle) {
@@ -140,6 +173,42 @@ export class MonsterDog implements IGameEntity {
    */
   setCloseWarning(active: boolean): void {
     this.animation.setCloseWarning(active);
+  }
+
+  /** Check if the dog's current position is on any ice zone */
+  private isOnIce(pos: { x: number; y: number; z: number }): boolean {
+    return this.iceZones.some(zone =>
+      pos.x >= zone.min.x && pos.x <= zone.max.x &&
+      pos.y >= zone.min.y && pos.y <= zone.max.y &&
+      pos.z >= zone.min.z && pos.z <= zone.max.z,
+    );
+  }
+
+  /** Roll for a slip event and execute it if triggered */
+  private trySlip(dogPos: { x: number; y: number; z: number }): void {
+    if (this.iceZones.length === 0) return;
+    if (!this.isOnIce(dogPos)) return;
+    if (this._slipCooldown > 0) return;
+
+    const slipChance = this.tuning.slipChance ?? 0;
+    if (slipChance <= 0) return;
+    if (Math.random() > slipChance) return;
+
+    const slipGap = this.tuning.slipGapBonus ?? 0;
+    if (slipGap <= 0) return;
+
+    // Execute slip: reduce progress, set slip animation, start timer
+    this._previousState = this._state;
+    this.state = DogState.Slip;
+    this._slipTimer = this.tuning.slipDuration ?? DEFAULT_SLIP_DURATION;
+
+    // Reduce progress (dog falls behind)
+    const slipProgress = slipGap / this.routePath.totalLength;
+    this.progress = Math.max(0, this.progress - slipProgress);
+
+    // Sync mesh to new progress
+    const pos = this.routePath.getPositionAtProgress(this.progress);
+    this.mesh.position.set(pos.x, pos.y, pos.z);
   }
 
   /**
@@ -159,7 +228,7 @@ export class MonsterDog implements IGameEntity {
       // Chase: aim for the player's position
       target = targetProgress;
     } else {
-      // Patrol: stay patrolDistance behind the player
+      // Patrol: stay patrolDistance behind the player (also applies during slip)
       target = Math.max(0, targetProgress - patrolOffset);
     }
 
@@ -181,6 +250,11 @@ export class MonsterDog implements IGameEntity {
     // Sync mesh
     const pos = this.routePath.getPositionAtProgress(this.progress);
     this.mesh.position.set(pos.x, pos.y, pos.z);
+
+    // Check for ice slip after movement (if not already slipping)
+    if (this._state !== DogState.Slip) {
+      this.trySlip(pos);
+    }
 
     // Sync spatial audio position
     if (this.audioHandle) {
