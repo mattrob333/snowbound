@@ -3,7 +3,7 @@
 **Spec source:** docs/PRD.md, docs/ARCHITECTURE.md, Snowbound.txt (full spec)
 **Repo:** https://github.com/mattrob333/snowbound.git
 **Workspace:** /home/mrobe/snowbound
-**Status:** Phase 7 complete — monster chase director with dog, chase trigger, catch, and UI warning. 152 tests green.
+**Status:** Phase 8 complete — hazard system with CrackedIceHazard, dog gap penalty, and major hazard callback. 181 tests green.
 
 ## Architecture: Two-Tier Build Loop
 - Inner Loop (builder) — every 3m: Check → Test → Advance → Repeat. Self-pauses both crons at a genuine stopping point.
@@ -17,9 +17,9 @@
 5. [x] Phase 4 — Slide and wall-run
 6. [x] Phase 5 — Level data loader
 7. [x] Phase 6 — Pickups and objectives
-8. [x] Phase 7 — Monster chase director
-9. [ ] Phase 8 — Hazard system
-10. [ ] Phase 9 — Save and progression
+|8. [x] Phase 7 — Monster chase director
+|9. [x] Phase 8 — Hazard system
+|10. [ ] Phase 9 — Save and progression
 11. [ ] Phase 10 — Build all 15 levels
 12. [ ] Phase 11 — Audio, animation, polish
 
@@ -32,13 +32,13 @@
 - **Phase 5:** LevelData interfaces, LevelLoader (spawn terrain/obstacles/part/safe zone/hazards), LevelManager (load/unload lifecycle), RoutePath (waypoint path + closest progress), level-01.json (Crash Site), LevelLoader.test.ts (11 tests). 77 tests passing (11 suites).
 - **Phase 6:** EntityManager, Pickup base, HelicopterPartPickup, Hud.ts, SafeZone.ts, PowerupPickup (temporary effects: speed_boost/dog_repel/shield/magnet with duration tracking, activation/deactivation callbacks), PlayerUpgradeService (permanent upgrade tracking with combined stat multipliers), UpgradePickup (permanent upgrade entity with type-specific octahedron visuals). 120 tests passing (16 suites).
 - **Phase 7:** MonsterChaseDirector + MonsterDog (brown capsule, route-based movement with patrol/chase states) + MonsterDistanceModel (gap calculation with close/catch thresholds, configurable). Dog moves along route waypoints; stays patrolDistance behind player during patrol; chases at chaseSpeed after part pickup; catch condition fires onCatchPlayer callback. Hud.ts: dog close warning element (red bottom bar, fades in when dog ≤ 8 units). Dog collision group added to CollisionGroups. 152 tests passing (19 suites).
-- **Phase 8 (partial):** Hazard base class (IGameEntity, template method pattern with trigger-radius detection, activate/spent lifecycle, onPlayerEnter/onActiveUpdate hooks). FallingIceHazard (trigger zone + delayed falling ice block with icosahedron visual + dynamic physics body). LevelManager creates hazard entities from level-01.json hazard data. 169 tests passing (21 suites).
+- **Phase 8:** Hazard base class (IGameEntity, template-method with trigger-radius detection, activate/spent lifecycle). FallingIceHazard (trigger zone + delayed falling ice block with icosahedron visual + dynamic physics body + onMajorHazard callback). CrackedIceHazard (stumble zone with cracked-color visual update + timer-based lifecycle). Dog gap penalty (hazards advance dog progress via MonsterChaseDirector.closeDogGap()). Game over callback (onMajorHazard on Hazard base, wired via FallingIceHazard). LevelManager creates hazards from JSON and wires dog gap penalty. 181 tests passing (22 suites).
 
 ## Open Issues / Blockers
 _(none yet)_
 
 ## Next Action
-- Phase 8: Hazard system — create Hazard base entity, FallingIceHazard (triggered by player proximity, falls after delay), CrackedIceHazard (stumble zone triggers momentary stumble), jump-over/slide-under obstacle handling, cliff death zone, dog gap penalty on hazards
+- Phase 9: Save and progression system — implement SaveService (localStorage persistence), save after level complete, save collected parts and upgrades, level select/unlock menu, reset save option
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.

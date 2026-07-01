@@ -72,10 +72,10 @@
 ## Phase 8: Hazard system
 - [x] Hazard base class (IGameEntity, template method with trigger-radius detection, activate/spent lifecycle)
 - [x] Falling ice hazard (FallingIceHazard — trigger zone, delayed drop, dynamic icosahedron block)
-- [ ] Cracked ice / stumble zones — CrackedIceHazard
-- [ ] Jump-over obstacles (already handled by player)
-- [ ] Dog gap penalty on mistakes
-- [ ] Game over on major hazards
+- [x] Cracked ice / stumble zones — CrackedIceHazard
+- [x] Jump-over obstacles (already handled by player physics/KCC)
+- [x] Dog gap penalty on mistakes (hazards advance dog progress via closeDogGap)
+- [x] Game over on major hazards (onMajorHazard callback on Hazard base, wired via FallingIceHazard)
 
 ## Phase 9: Save and progression
 - [ ] SaveService (localStorage)

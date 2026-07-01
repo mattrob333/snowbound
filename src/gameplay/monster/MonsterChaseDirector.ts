@@ -64,6 +64,12 @@ export class MonsterChaseDirector implements IGameEntity {
     this.dog.state = 'chase';
   }
 
+  /** Close the gap between dog and player by advancing the dog's progress */
+  closeDogGap(amount: number): void {
+    if (this.caught || this.complete) return;
+    this.dog.setProgress(Math.min(1, this.dog.progress + amount));
+  }
+
   update(_dt: number, ctx: GameContext): void {
     if (this.caught || this.complete) return;
 

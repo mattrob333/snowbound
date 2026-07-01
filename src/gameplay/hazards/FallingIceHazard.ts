@@ -61,12 +61,13 @@ export class FallingIceHazard extends Hazard {
       return;
     }
 
-    // When the ice block hits the ground, mark spent
+    // When the ice block hits the ground, mark spent and signal major hazard
     if (this.iceBody) {
       const pos = this.iceBody.translation();
       if (pos.y <= this.position.y + this.iceHalf.y + 0.1) {
         this.falling = false;
         this.spent = true;
+        this.onMajorHazard?.();
       }
     }
   }

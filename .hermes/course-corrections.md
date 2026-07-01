@@ -12,12 +12,13 @@ The INNER loop reads this FIRST every tick and resolves OPEN corrections as top 
 
 ## Open Corrections
 
-### MEDIUM — Builder crash mid-tick: uncommitted Phase 8 work — OPEN (audit 2026-06-30 23:49 UTC)
-Problem: Builder lock was stale (4+ hours old at 19:36 UTC, current time 23:49). Lock file `.hermes/builder.lock` was removed. Builder created Phase 8 files (Hazard.ts, FallingIceHazard.ts, tests, LevelManager changes, TASKS.md/build-state.md updates) but never committed them. Supervisor verified quality gate on working tree (169 tests ✅, typecheck ✅, lint 0 errors ✅, build ✅) and committed as 74ed984 (feat: Phase 8 — Hazard base + FallingIceHazard). No code issues found — pure commit failure.
-Required fix: Builder's next tick should verify that Phase 8 work (74ed984) is in place by checking the state files, then continue to next Phase 8 tasks. No rework needed.
-Acceptance: git log shows 74ed984 on main, Phase 8 files present, 169 tests passing.
+_(none — inner loop in alignment as of last audit)_
 
 ## Resolved Corrections
+
+### MEDIUM — Builder crash mid-tick: uncommitted Phase 8 work — RESOLVED (commit 74ed984 — verified by builder tick at 2026-06-30T19:53 UTC)
+Problem: Builder lock was stale (4+ hours old at 19:36 UTC). Builder created Phase 8 files (Hazard.ts, FallingIceHazard.ts, tests, LevelManager changes, TASKS.md/build-state.md updates) but never committed them. Supervisor verified quality gate on working tree (169 tests ✅, typecheck ✅, lint 0 errors ✅, build ✅) and committed as 74ed984.
+Verification: All files present, 169 tests still green, typecheck clean. Builder proceeding with Phase 8 tasks: CrackedIceHazard + dog gap penalty.
 
 ### BLOCKER — Wrong import path in PlayerMovementState.test.ts — RESOLVED (commit e2eb713)
 Fix: Changed line 2 from `'../../gameplay/player/PlayerMovementState'` to `'../gameplay/player/PlayerMovementState'`.

@@ -28,6 +28,8 @@ export abstract class Hazard implements IGameEntity {
 
   /** Called when the player enters the trigger zone */
   onActivate: (() => void) | null = null;
+  /** Called when a major hazard hits the player (e.g. falling ice) — triggers game over */
+  onMajorHazard: (() => void) | null = null;
 
   constructor(
     hazardType: HazardType,

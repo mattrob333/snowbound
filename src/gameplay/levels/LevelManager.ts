@@ -7,9 +7,10 @@ import { HelicopterPartPickup } from '../pickups/HelicopterPartPickup';
 import { SafeZone } from './SafeZone';
 import { MonsterChaseDirector } from '../monster/MonsterChaseDirector';
 import { FallingIceHazard } from '../hazards/FallingIceHazard';
+import { CrackedIceHazard } from '../hazards/CrackedIceHazard';
 import type { Hazard } from '../hazards/Hazard';
 
-function createHazardFromSpawn(spawn: HazardSpawn): Hazard | null {
+function createHazardFromSpawn(spawn: HazardSpawn, _runtime: LevelRuntime): Hazard | null {
   switch (spawn.type) {
     case 'falling_ice':
       return new FallingIceHazard(
@@ -17,6 +18,13 @@ function createHazardFromSpawn(spawn: HazardSpawn): Hazard | null {
         spawn.halfExtents,
         spawn.triggerRadius ?? 2,
         spawn.fallDelay ?? 1.0,
+      );
+    case 'cracked_ice':
+      return new CrackedIceHazard(
+        spawn.position,
+        spawn.halfExtents,
+        spawn.triggerRadius ?? 2.5,
+        // Cracked ice defaults to 2s active duration
       );
     default:
       // Other hazard types not yet implemented
@@ -122,9 +130,21 @@ export class LevelManager {
 
       // Create hazard entities from level data
       for (const spawn of data.hazards) {
-        const hazard = createHazardFromSpawn(spawn);
+        const hazard = createHazardFromSpawn(spawn, runtime);
         if (hazard) {
           entityManager.add(hazard);
+          // Wire hazards to close the dog gap on activation
+          const spawnedHazard = hazard;
+          spawnedHazard.onActivate = () => {
+            if (this._chaseDirector && !this._chaseDirector.caught) {
+              if ('dogGapPenalty' in spawnedHazard) {
+                const penalty = (spawnedHazard as unknown as { dogGapPenalty: number }).dogGapPenalty;
+                this._chaseDirector.closeDogGap(penalty);
+              } else {
+                this._chaseDirector.closeDogGap(0.08);
+              }
+            }
+          };
         }
       }
     }
