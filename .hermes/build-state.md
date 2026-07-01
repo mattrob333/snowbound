@@ -38,14 +38,21 @@
 
 ## Open Issues / Blockers
 - Dog slip comedy event (low priority — not part of original 10-slice plan)
+- 2026-06-30 local QA pass: pulled through Phase 10 plus Phase 11 slices 1-5 from `origin/main`, then corrected screen-relative A/D movement and cleaned visible HUD/level-select mojibake. Re-run full quality gate before pushing.
+- 2026-06-30 gameplay QA pass: added in-game controls/goal legend, dog-caught damage feedback, level-start entity cleanup, level spawn positioning, and removed duplicate raw part/safe-zone placeholders from the entity-backed app path.
+- 2026-06-30 live-control QA pass: fixed Space jump edge handling in the game loop, widened pickup collection tolerance for elevated helicopter parts, and added direct dog-world-contact catch detection so visible contact triggers damage/caught feedback.
+- No current blocking compile/test issue. Remaining lint output is test-only `no-explicit-any` warnings.
 
 ## Next Action
-- All Phase 11 slices complete. Check BUILD_STOP_CONDITIONS: 330 tests passing, quality gate green, all planned work complete. The dog slip comedy event in TASKS.md is an unplanned bonus task. If no further work is needed, this loop is ready to stop.
+- All Phase 11 slices are complete. Check BUILD_STOP_CONDITIONS: 330+ tests passing, quality gate green, all planned work complete.
+- Recommended handoff work: add an explicit caught/game-over flow after dog contact, improve the placeholder visuals beyond primitives, and playtest all 15 levels for reachable parts, safe-zone completion, and dog chase tuning.
+- Optional bonus: dog slip comedy event.
 
 ## Pitfalls / Notes for Future Ticks
 - Commit each green slice before starting the next file.
 - Always `git pull` before working (multiple agents + user push).
 - Quality gate: `npm run typecheck && npm run lint && npm test && npm run build`
+- Latest local gate after rebasing onto `origin/main`: `npm run typecheck`, `npm run test` (333 tests), `npm run build`, and `npm run lint` all pass; lint reports 39 existing test `no-explicit-any` warnings.
 - Placeholder-first: use Three.js primitives (capsule, box, sphere) for all characters until Phase 11.
 - Levels are data-driven via JSON — never hardcode level geometry in gameplay systems.
 - enum keyword is banned by tsconfig's `erasableSyntaxOnly: true` — use const objects + type alias pattern.

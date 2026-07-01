@@ -23,7 +23,6 @@ export class ThreeRenderer {
     this.camera.lookAt(0, 0, 0);
 
     window.addEventListener('resize', () => this.handleResize());
-    document.body.appendChild(this.renderer.domElement);
   }
 
   private handleResize(): void {
@@ -38,6 +37,6 @@ export class ThreeRenderer {
 
   dispose(): void {
     this.renderer.dispose();
-    document.body.removeChild(this.renderer.domElement);
+    this.renderer.domElement.parentElement?.removeChild(this.renderer.domElement);
   }
 }

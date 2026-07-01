@@ -60,9 +60,10 @@ export class PlayerController {
   }
 
   update(dt: number, input: InputManager, cameraAzimuth: number): void {
-    // Camera-relative movement directions
-    this.forward.set(-Math.sin(cameraAzimuth), 0, -Math.cos(cameraAzimuth));
-    this.right.set(this.forward.z, 0, -this.forward.x);
+    // Screen-relative movement directions. W/S move vertically on screen
+    // (away from/toward the camera), while A/D move horizontally on screen.
+    this.forward.set(-Math.cos(cameraAzimuth), 0, -Math.sin(cameraAzimuth));
+    this.right.set(Math.sin(cameraAzimuth), 0, -Math.cos(cameraAzimuth));
 
     // Read input
     const moveX =

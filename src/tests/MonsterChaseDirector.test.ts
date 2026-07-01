@@ -87,6 +87,22 @@ describe('MonsterChaseDirector', () => {
     director.dispose();
   });
 
+  it('should catch the player on direct world contact', () => {
+    const director = new MonsterChaseDirector(waypoints, tuning, null);
+    let caught = false;
+    director.onCatchPlayer = () => { caught = true; };
+
+    director.update(1 / 60, makeMockCtx(50, true));
+    director.dog.mesh.position.set(50.5, 0, 0.5);
+
+    director.update(1 / 60, makeMockCtx(50, true));
+
+    expect(director.caught).toBe(true);
+    expect(caught).toBe(true);
+    expect(director.dog.state).toBe('caught');
+    director.dispose();
+  });
+
   it('should not trigger chase more than once', () => {
     const director = new MonsterChaseDirector(waypoints, tuning, null);
 

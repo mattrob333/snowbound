@@ -7,6 +7,8 @@ import type { GameContext } from '../../app/GameContext';
 import type { Vec3 } from '../levels/LevelData';
 import { PLAYER_HEIGHT, PLAYER_RADIUS } from '../../config/constants';
 
+const PICKUP_SENSOR_HALF = { x: 0.85, y: 1.2, z: 0.85 };
+
 /**
  * Base Pickup entity — a sensor body that detects player overlap
  * and fires an onCollect callback.
@@ -35,7 +37,11 @@ export class Pickup implements IGameEntity {
         .setTranslation(position.x, position.y, position.z)
     );
 
-    const colliderDesc = RAPIER.ColliderDesc.cuboid(0.5, 0.5, 0.5)
+    const colliderDesc = RAPIER.ColliderDesc.cuboid(
+      PICKUP_SENSOR_HALF.x,
+      PICKUP_SENSOR_HALF.y,
+      PICKUP_SENSOR_HALF.z,
+    )
       .setSensor(true)
       .setCollisionGroups(0x0001_0001); // Member: Player, Filter: Player
     this.sensorCollider = physics.addCollider(colliderDesc, this.body);
@@ -62,14 +68,13 @@ export class Pickup implements IGameEntity {
     if (!this._collected && ctx.player) {
       const playerPos = ctx.player.kcc.getPosition();
       const sensorPos = this.body.translation();
-      const sensorHalf = { x: 0.5, y: 0.5, z: 0.5 };
       const playerHalf = {
         x: PLAYER_RADIUS,
         y: PLAYER_HEIGHT / 2,
         z: PLAYER_RADIUS,
       };
       if (this.physics.boxesOverlap(
-        { x: sensorPos.x, y: sensorPos.y, z: sensorPos.z }, sensorHalf,
+        { x: sensorPos.x, y: sensorPos.y, z: sensorPos.z }, PICKUP_SENSOR_HALF,
         { x: playerPos.x, y: playerPos.y, z: playerPos.z }, playerHalf,
       )) {
         this.collect();

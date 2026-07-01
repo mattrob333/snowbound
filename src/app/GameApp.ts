@@ -133,11 +133,29 @@ export class GameApp {
   private async loadLevelWithSave(levelId: string, entityManager: EntityManager): Promise<void> {
     const ctx = this.ctx;
 
+    if (ctx.levelManager.isLevelLoaded) {
+      ctx.levelManager.unloadCurrent();
+    }
+    entityManager.clear();
+
     await ctx.levelManager.loadLevel(levelId, entityManager, () => {
       // On part collect: mark player state and persist to save
       ctx.player.partCollected = true;
       ctx.saveService.addPart();
     });
+
+    const spawn = ctx.levelManager.runtime?.playerSpawn;
+    if (spawn) {
+      ctx.player.kcc.setPosition(spawn);
+      ctx.player.mesh.position.set(spawn.x, spawn.y - 0.9, spawn.z);
+      ctx.player.getCameraRig().teleport(new THREE.Vector3(spawn.x, spawn.y + 1.4, spawn.z));
+    }
+
+    if (ctx.levelManager.chaseDirector) {
+      ctx.levelManager.chaseDirector.onCatchPlayer = () => {
+        console.log('[Snowbound] Player was caught by the dog.');
+      };
+    }
 
     // Wire level complete callback on the safe zone
     if (ctx.levelManager.safeZone) {
@@ -164,9 +182,8 @@ export class GameApp {
     this.levelSelectScreen?.hide();
     this.hud.show();
 
-    await this.loadLevelWithSave(levelId, this.ctx.entityManager);
     this.ctx.player.resetLevelState();
-    this.ctx.player.mesh.position.set(0, 4, 0);
+    await this.loadLevelWithSave(levelId, this.ctx.entityManager);
   }
 
   /**

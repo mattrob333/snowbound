@@ -59,7 +59,36 @@ describe('PlayerController', () => {
     }
 
     const pos = kcc.getPosition();
-    expect(pos.z).toBeLessThan(-1);
+    expect(pos.x).toBeLessThan(-1);
+    expect(Math.abs(pos.z)).toBeLessThan(0.5);
+  });
+
+  it('should map WASD to screen up/down/left/right at the default camera angle', () => {
+    function moveOnce(action: ControlAction): { x: number; z: number } {
+      const { kcc, input, controller } = createController();
+      kcc.setPosition({ x: 0, y: 3, z: 0 });
+      physics.step(1 / 60);
+
+      for (let i = 0; i < 120; i++) {
+        controller.update(1 / 60, input, 0);
+        physics.step(1 / 60);
+      }
+
+      input.setAction(action, true);
+      for (let i = 0; i < 30; i++) {
+        controller.update(1 / 60, input, 0);
+        physics.step(1 / 60);
+      }
+
+      const pos = kcc.getPosition();
+      kcc.dispose();
+      return { x: pos.x, z: pos.z };
+    }
+
+    expect(moveOnce(ControlAction.MoveForward).x).toBeLessThan(-0.75);
+    expect(moveOnce(ControlAction.MoveBackward).x).toBeGreaterThan(0.75);
+    expect(moveOnce(ControlAction.StrafeLeft).z).toBeGreaterThan(0.75);
+    expect(moveOnce(ControlAction.StrafeRight).z).toBeLessThan(-0.75);
   });
 
   it('should report sprinting when sprint is held', () => {

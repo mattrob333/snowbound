@@ -183,6 +183,27 @@ describe('Pickup entity detection via Pickup.update()', () => {
     pickup.dispose();
   });
 
+  it('should collect the level part when the player is close beneath it', async () => {
+    const { Pickup } = await import('../gameplay/pickups/Pickup');
+    const pickup = new Pickup(
+      physics, null, { x: 0, y: 2, z: 0 },
+    );
+
+    const { CharacterKCC } = await import('../engine/physics/CharacterKCC');
+    const kcc = new CharacterKCC(physics, PLAYER_HEIGHT, PLAYER_RADIUS);
+    kcc.setPosition({ x: 0.45, y: 1, z: 0.45 });
+
+    const ctx = { player: { kcc } } as any;
+
+    physics.step(1 / 60);
+    pickup.update(1 / 60, ctx);
+
+    expect(pickup.collected).toBe(true);
+
+    kcc.dispose();
+    pickup.dispose();
+  });
+
   it('should NOT detect pickup when player is far away', async () => {
     const { Pickup } = await import('../gameplay/pickups/Pickup');
     const pickup = new Pickup(

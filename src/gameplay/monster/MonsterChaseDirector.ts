@@ -23,6 +23,7 @@ export class MonsterChaseDirector implements IGameEntity {
   readonly dog: MonsterDog;
   readonly distanceModel: MonsterDistanceModel;
   readonly routePath: RoutePath;
+  private readonly worldCatchRadius: number;
 
   /** Whether the chase has been triggered */
   chaseActive = false;
@@ -60,6 +61,7 @@ export class MonsterChaseDirector implements IGameEntity {
       Math.max(tuning.catchRadius, 0.5),  // catch threshold from tuning
     );
     this._musicLayer = musicLayer ?? null;
+    this.worldCatchRadius = Math.max(tuning.catchRadius, 1.8);
   }
 
   /** Move the dog to a specific spawn position */
@@ -97,6 +99,8 @@ export class MonsterChaseDirector implements IGameEntity {
       this.startChase();
     }
 
+    const wasTouchingPlayer = this.isDogTouchingPlayer(pPos);
+
     // Move dog towards player
     this.dog.moveTowardsPlayer(this.playerProgress, ctx.clock.delta);
 
@@ -117,11 +121,18 @@ export class MonsterChaseDirector implements IGameEntity {
     this._musicLayer?.update(ctx.clock.delta, alert.gap, this.caught, this.complete);
 
     // Check catch condition
-    if (alert.caught && this.chaseActive) {
+    if ((alert.caught || wasTouchingPlayer || this.isDogTouchingPlayer(pPos)) && this.chaseActive) {
       this.caught = true;
       this.dog.state = 'caught';
       this.onCatchPlayer?.();
     }
+  }
+
+  private isDogTouchingPlayer(playerPos: Vec3): boolean {
+    const dogPos = this.dog.getPosition();
+    const dx = dogPos.x - playerPos.x;
+    const dz = dogPos.z - playerPos.z;
+    return Math.hypot(dx, dz) <= this.worldCatchRadius;
   }
 
   dispose(): void {

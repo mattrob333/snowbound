@@ -1,7 +1,7 @@
 import type { SaveService } from '../save/SaveService';
 
 /**
- * LevelSelectScreen — DOM-based level selection overlay.
+ * DOM-based level selection overlay.
  * Shows unlocked levels and allows the player to start a level or reset save data.
  */
 export class LevelSelectScreen {
@@ -25,7 +25,7 @@ export class LevelSelectScreen {
     this.container.style.cssText = `
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -44,9 +44,8 @@ export class LevelSelectScreen {
   private render(): void {
     this.container.innerHTML = '';
 
-    // Title
     const title = document.createElement('h1');
-    title.textContent = '🛩️ Snowbound';
+    title.textContent = 'Snowbound';
     title.style.cssText = `
       font-size: 36px;
       margin-bottom: 8px;
@@ -54,7 +53,6 @@ export class LevelSelectScreen {
     `;
     this.container.appendChild(title);
 
-    // Subtitle
     const subtitle = document.createElement('p');
     subtitle.textContent = 'Select a level to play';
     subtitle.style.cssText = `
@@ -64,7 +62,6 @@ export class LevelSelectScreen {
     `;
     this.container.appendChild(subtitle);
 
-    // Level grid
     const grid = document.createElement('div');
     grid.style.cssText = `
       display: grid;
@@ -82,7 +79,7 @@ export class LevelSelectScreen {
 
       const btn = document.createElement('button');
       btn.textContent = `${i}`;
-      btn.title = unlocked ? (completed ? `✅ ${levelId} — completed` : levelId) : '🔒 Locked';
+      btn.title = unlocked ? (completed ? `${levelId} - completed` : levelId) : 'Locked';
       btn.style.cssText = `
         width: 64px;
         height: 64px;
@@ -113,7 +110,6 @@ export class LevelSelectScreen {
 
     this.container.appendChild(grid);
 
-    // Progress info
     const completedCount = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
       .map(i => `level-${String(i).padStart(2, '0')}`)
       .filter(id => this.saveService.isLevelCompleted(id))
@@ -122,7 +118,7 @@ export class LevelSelectScreen {
     const upgrades = this.saveService.getUpgrades().length;
 
     const stats = document.createElement('p');
-    stats.textContent = `📊 ${completedCount}/15 levels complete · ${parts} parts · ${upgrades} upgrades`;
+    stats.textContent = `${completedCount}/15 levels complete - ${parts} parts - ${upgrades} upgrades`;
     stats.style.cssText = `
       font-size: 14px;
       color: #888;
@@ -130,13 +126,11 @@ export class LevelSelectScreen {
     `;
     this.container.appendChild(stats);
 
-    // Buttons row
     const btnRow = document.createElement('div');
     btnRow.style.cssText = 'display: flex; gap: 12px;';
 
-    // Reset save button
     const resetBtn = document.createElement('button');
-    resetBtn.textContent = '🗑️ Reset Save';
+    resetBtn.textContent = 'Reset Save';
     resetBtn.style.cssText = `
       padding: 10px 20px;
       font-size: 14px;
@@ -152,14 +146,13 @@ export class LevelSelectScreen {
     resetBtn.onclick = () => {
       if (confirm('Reset all progress? This cannot be undone.')) {
         this.saveService.resetAll();
-        this.render(); // Re-render to show fresh state
+        this.render();
       }
     };
     btnRow.appendChild(resetBtn);
 
-    // Back button (hidden by default, shown when in-game pause)
     const backBtn = document.createElement('button');
-    backBtn.textContent = '↩ Back';
+    backBtn.textContent = 'Back';
     backBtn.style.cssText = `
       padding: 10px 20px;
       font-size: 14px;
@@ -178,29 +171,27 @@ export class LevelSelectScreen {
     this.container.appendChild(btnRow);
   }
 
-  /** Show the level select screen */
   show(): void {
     if (this.visible) return;
-    this.render(); // Refresh state
+    this.render();
+    this.container.style.display = 'flex';
     this.container.style.opacity = '1';
     this.container.style.pointerEvents = 'all';
     this.visible = true;
   }
 
-  /** Hide the level select screen */
   hide(): void {
     if (!this.visible) return;
     this.container.style.opacity = '0';
     this.container.style.pointerEvents = 'none';
+    this.container.style.display = 'none';
     this.visible = false;
   }
 
-  /** Attach to parent element */
   attach(parent: HTMLElement): void {
     parent.appendChild(this.container);
   }
 
-  /** Detach from parent */
   detach(): void {
     this.container.remove();
   }

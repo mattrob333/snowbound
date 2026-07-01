@@ -28,7 +28,7 @@
 - [x] Jim capsule placeholder (CharacterKCC)
 - [x] Kinematic character controller
 - [x] InputManager functional (keyboard events, ControlAction mapping)
-- [x] WASD + camera-relative movement
+- [x] WASD + screen-relative movement (W/S vertical, A/D horizontal)
 - [x] Sprint
 - [x] Jump
 - [x] Third-person follow camera
@@ -114,3 +114,18 @@
 - [x] Chase music layers — MusicLayerManager with patrol/chase crossfade based on dog proximity
 - [x] Jim voice lines
 - [ ] Dog slip comedy event
+
+## Current QA Fixes
+- [x] HUD controls and goal legend
+- [x] Dog caught/damage feedback in HUD
+- [x] Entity-backed levels remove duplicate raw part/safe-zone placeholders
+- [x] Level start clears previous entities and applies playerSpawn
+- [x] Space jump input survives until the player controller consumes it
+- [x] Helicopter part pickup sensor is forgiving enough for elevated part visuals
+- [x] Dog direct world contact triggers caught/damage state, not just route-progress catch
+
+## Handoff Next Steps
+- [ ] Add an explicit caught/game-over state after dog contact
+- [ ] Replace primitive placeholder visuals with stronger readable assets
+- [ ] Playtest all 15 levels for reachable parts, safe-zone completion, and dog chase tuning
+- [ ] Dog slip comedy event (optional bonus polish)
